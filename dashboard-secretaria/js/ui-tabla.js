@@ -20,7 +20,6 @@ export function generarTablaHorarios() {
   });
 }
 
-// === Delegación de clics en las celdas ===
 export function inicializarDelegacionClick() {
   const tabla = document.getElementById("tablaCitas");
   const nuevo = tabla.cloneNode(true);
@@ -36,7 +35,10 @@ export function inicializarDelegacionClick() {
     const fecha = document.getElementById("inputFechaCalendario").value;
 
     const form = document.getElementById("formRegistrarCita");
+    const formContainer = document.getElementById("formContainer"); // <- importante
+    const resumen = document.getElementById("resumenCitaContainer");
     const modal = document.getElementById("modalRegistrarCita");
+
     modal.style.display = "flex";
 
     try {
@@ -48,21 +50,54 @@ export function inicializarDelegacionClick() {
       document.getElementById("hora").value = hora;
 
       if (idCita) {
-        document.getElementById("idCita").value = idCita;
-        document.getElementById("btnGuardarCita").textContent = "Actualizar";
-        document.getElementById("estadoContainer").style.display = "block";
+        const estado = celda.dataset.estado || "ACTIVO";
 
-        document.getElementById("tipo").value = celda.dataset.tipo || "";
-        document.getElementById("observaciones").value = celda.dataset.observaciones || "";
-        document.getElementById("psicologo").value = celda.dataset.psicologoId || "";
-        document.getElementById("paciente").value = celda.dataset.pacienteId || "";
-        document.getElementById("estado").value = celda.dataset.estado || "ACTIVO";
-        document.getElementById("estado").dataset.original = celda.dataset.estado || "ACTIVO";
+        if (estado === "ATENDIDA" || estado === "NO_ASISTIO") {
+          // Mostrar solo el resumen
+          formContainer.style.display = "none";
+          resumen.style.display = "block";
+
+          document.getElementById("resumenPaciente").textContent = celda.dataset.pacienteNombre || "";
+          document.getElementById("resumenPsicologo").textContent = celda.dataset.psicologoNombre || "";
+          document.getElementById("resumenTipo").textContent = celda.dataset.tipo || "";
+          document.getElementById("resumenFechaHora").textContent = `${fecha} ${hora}`;
+          document.getElementById("resumenObservaciones").textContent = celda.dataset.observaciones || "";
+          document.getElementById("resumenEstado").textContent = estado === "ATENDIDA" ? "La cita ha sido atendida" : "No asistió";
+          document.getElementById("resumenPago").textContent = "Pago generado: $" + (celda.dataset.pago || "0");
+
+
+
+        } else {
+          // Mostrar formulario para editar
+          formContainer.style.display = "block";
+          resumen.style.display = "none";
+
+          document.getElementById("idCita").value = idCita;
+          document.getElementById("btnGuardarCita").textContent = "Actualizar";
+          document.getElementById("estadoContainer").style.display = "block";
+
+          document.getElementById("tipo").value = celda.dataset.tipo || "";
+          document.getElementById("observaciones").value = celda.dataset.observaciones || "";
+          document.getElementById("psicologo").value = celda.dataset.psicologoId || "";
+          document.getElementById("paciente").value = celda.dataset.pacienteId || "";
+          document.getElementById("estado").value = estado;
+          document.getElementById("estado").dataset.original = estado;
+        }
       } else {
+        // Nueva cita
+        formContainer.style.display = "block"; // mostrar formulario con título
+        resumen.style.display = "none";
+
         document.getElementById("idCita").value = "";
         document.getElementById("btnGuardarCita").textContent = "Guardar";
         document.getElementById("estadoContainer").style.display = "none";
       }
+
+      // Botón cerrar resumen
+      document.getElementById("cerrarResumen").onclick = () => {
+        modal.style.display = "none";
+      };
+
     } catch (err) {
       console.error(err);
       alert("No se pudieron cargar psicólogos o pacientes");

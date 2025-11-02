@@ -56,20 +56,28 @@ export async function cargarCitas(token, fechaSeleccionada) {
                         celda.style.background = "#d0e6f7";
                         celda.style.cursor = "pointer";
 
+                        const pago = cita.pagoInicialMonto ||
+                            (cita.pagos && cita.pagos.reduce((sum, p) => sum + p.monto, 0)) || 0;
+
                         Object.assign(celda.dataset, {
                             id: cita.idCitas,
                             psicologoId: cita.psicologoId,
+                            psicologoNombre: cita.psicologoNombre,
                             pacienteId: cita.pacienteId,
+                            pacienteNombre: cita.pacienteNombre,
                             tipo: cita.tipo || "",
                             observaciones: cita.observaciones || "",
                             estado: cita.estado || "ACTIVO",
                             fecha: cita.fecha,
-                            hora: horaCita
+                            hora: horaCita,
+                            pago: pago
                         });
+
                     }
                 }
             });
         });
+
 
         inicializarDelegacionClick();
     } catch (err) {
