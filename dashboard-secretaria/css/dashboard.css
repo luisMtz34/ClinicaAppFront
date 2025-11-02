@@ -1,0 +1,308 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #c6d4e1; /* fondo general suave */
+  color: #333;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #44749d; /* azul principal */
+  color: white;
+  padding: 15px 30px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.navbar h1 {
+  font-size: 1.8rem;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.btn-nav:hover {
+  background: #bdb8ad;
+  color: #44749d;
+}
+
+/* Contenido principal */
+.content {
+  padding: 30px;
+}
+
+/* Encabezado con botón */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  color: #44749d;
+}
+
+.btn-primary {
+  background: #44749d;
+  color: #ffffff;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  background: #a9a6a0;
+  color: #44749d;
+}
+
+/* Tabla tipo horario */
+.table-container {
+  background: #ebe7e0;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  max-width: 800px;
+  margin: 40px auto;
+  text-align: center;
+}
+
+.table-container h2 {
+  color: #44749d;
+  margin-bottom: 15px;
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.styled-table th, .styled-table td {
+  border: 1px solid #bdb8ad;
+  padding: 12px;
+  height: 50px;
+  text-align: center;
+}
+
+.styled-table th {
+  background: #44749d;
+  color: white;
+}
+
+.styled-table td {
+  background: #fff;
+  transition: background 0.2s;
+}
+
+.styled-table td:hover {
+  background: #c6d4e1;
+  cursor: pointer;
+}
+
+/* ===== MODAL ===== */
+.modal {
+  display: none; /* oculto por defecto */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  z-index: 1000;
+
+  /* 🔹 Importante: estos sí aplican cuando se muestra (display:flex) */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Cuando el JS hace "display: flex" se verá centrado */
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* === FORMULARIO DENTRO DEL MODAL === */
+#formRegistrarCita {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#formRegistrarCita label {
+  font-weight: 600;
+  color: #44749d;
+  text-align: left;
+}
+
+#formRegistrarCita input,
+#formRegistrarCita select,
+#formRegistrarCita textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+#formRegistrarCita input:focus,
+#formRegistrarCita select:focus,
+#formRegistrarCita textarea:focus {
+  border-color: #44749d;
+  box-shadow: 0 0 3px rgba(68,116,157,0.3);
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.btn-guardar {
+  background: #44749d;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn-guardar:hover {
+  background: #365f7d;
+}
+
+.btn-cancelar {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.btn-cancelar:hover {
+  background: #a9a6a0;
+}
+
+.fecha-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-fecha {
+  background: #44749d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+  min-width: 100px;
+}
+
+.btn-fecha:hover {
+  background: #a9a6a0;
+  color: #44749d;
+}
+
+.fecha-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+#fechaActual {
+  font-size: 1.3rem;
+  color: #44749d;
+  margin: 0;
+}
+
+#inputFechaCalendario {
+  background-color: #f4f4f4;
+  border: 1px solid #44749d;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  color: #2d4059;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#inputFechaCalendario:hover {
+  background-color: #e8f0fe;
+  border-color: #a9a6a0;
+}
+
+#inputFechaCalendario:focus {
+  outline: none;
+  border-color: #2d4059;
+  background-color: #eef5ff;
+}
+.btn-fecha {
+  background-color: #44749d;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-fecha:hover {
+  background-color: #365a7d;
+}
+
+#btnHoy {
+  background-color: #45c482; /* verde suave */
+  margin-left: 10px;
+}
+
+#btnHoy:hover {
+  background-color: #209653;
+  color: #c6d4e1;
+  transform: scale(1.05);
+
+}

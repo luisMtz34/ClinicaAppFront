@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Pacientes</title>
+  <link rel="stylesheet" href="paciente.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <header>
+    <h1>Gestión de Pacientes</h1>
+    <button id="btnSalir">Volver</button>
+  </header>
+
+  <main>
+    <!-- Formulario de registro -->
+    <section class="form-container">
+      <h2>Registrar nuevo paciente</h2>
+      <form id="formPaciente">
+
+        <label>Clave:</label>
+        <input type="text" id="clave" required>
+
+        <label>Nombre completo:</label>
+        <input type="text" id="nombre" required>
+
+        <label>Fecha de nacimiento:</label>
+        <input type="date" id="fechaNac" required>
+
+        <label>Sexo:</label>
+        <select id="sexo" required>
+          <option value="">Seleccione</option>
+          <option value="MASCULINO">Masculino</option>
+          <option value="FEMENINO">Femenino</option>
+        </select>
+
+        <label>Teléfono:</label>
+        <input type="tel" id="telefono" required>
+
+        <label>Contacto de emergencia:</label>
+        <input type="text" id="contacto" required>
+
+        <label>Parentesco:</label>
+        <input type="text" id="parentesco" required>
+
+        <label>Teléfono del contacto:</label>
+        <input type="tel" id="telefonoC" required>
+
+        <button type="submit" class="btn-primary">Registrar Paciente</button>
+      </form>
+    </section>
+
+    <!-- Tabla de pacientes -->
+    <section class="table-container">
+      <h2>Pacientes registrados</h2>
+      <table id="tablaPacientes" class="styled-table">
+        <thead>
+          <tr>
+            <th>Clave</th>
+            <th>Nombre</th>
+            <th>Fecha Nac.</th>
+            <th>Sexo</th>
+            <th>Teléfono</th>
+            <th>Contacto</th>
+            <th>Parentesco</th>
+            <th>Teléfono C</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Datos dinámicos -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+<!-- Modal para editar paciente -->
+<div id="modalEditarPaciente" class="modal">
+  <div class="modal-content">
+    <h3>Editar Paciente</h3>
+    <form id="formEditarPaciente">
+      <input type="text" id="editClave">
+
+      <label>Nombre completo:</label>
+      <input type="text" id="editNombre" required>
+
+      <label>Fecha de nacimiento:</label>
+      <input type="date" id="editFechaNac" required>
+
+      <label>Sexo:</label>
+      <select id="editSexo" required>
+        <option value="MASCULINO">Masculino</option>
+        <option value="FEMENINO">Femenino</option>
+      </select>
+
+      <label>Teléfono:</label>
+      <input type="tel" id="editTelefono" required>
+
+      <label>Contacto de emergencia:</label>
+      <input type="text" id="editContacto" required>
+
+      <label>Parentesco:</label>
+      <input type="text" id="editParentesco" required>
+
+      <label>Teléfono del contacto:</label>
+      <input type="tel" id="editTelefonoC" required>
+
+      <div class="modal-buttons">
+        <button type="submit" class="btn-guardar">Guardar</button>
+        <button type="button" id="cerrarModalPaciente" class="btn-cancelar">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+  <script src="paciente.js"></script>
+</body>
+</html>

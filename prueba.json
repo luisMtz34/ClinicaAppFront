@@ -1,0 +1,29 @@
+{
+  "pacientes": {
+    "p001": {
+      "nombre": "Luis Álvarez",
+      "edad": 25,
+      "correo": "luis@example.com"
+    },
+    "p002": {
+      "nombre": "Ana López",
+      "edad": 30,
+      "correo": "ana@example.com"
+    }
+  },
+  "medicamentos": {
+    "m001": {
+      "nombre": "Paracetamol",
+      "dosis": "500 mg",
+      "frecuencia": "Cada 8 horas"
+    }
+  },
+  "seguimientos": {
+    "s001": {
+      "idPaciente": "p001",
+      "idMedicamento": "m001",
+      "fecha": "2025-10-20",
+      "estado": "En tratamiento"
+    }
+  }
+}
