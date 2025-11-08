@@ -35,7 +35,7 @@ export function inicializarDelegacionClick() {
     const fecha = document.getElementById("inputFechaCalendario").value;
 
     const form = document.getElementById("formRegistrarCita");
-    const formContainer = document.getElementById("formContainer"); // <- importante
+    const formContainer = document.getElementById("formContainer");
     const resumen = document.getElementById("resumenCitaContainer");
     const modal = document.getElementById("modalRegistrarCita");
 
@@ -62,12 +62,13 @@ export function inicializarDelegacionClick() {
           document.getElementById("resumenTipo").textContent = celda.dataset.tipo || "";
           document.getElementById("resumenFechaHora").textContent = `${fecha} ${hora}`;
           document.getElementById("resumenObservaciones").textContent = celda.dataset.observaciones || "";
-          document.getElementById("resumenEstado").textContent = estado === "ATENDIDA" ? "La cita ha sido atendida" : "No asistió";
+          document.getElementById("resumenEstado").textContent =
+            estado === "ATENDIDA" ? "La cita ha sido atendida" : "No asistió";
           document.getElementById("resumenPago").textContent = "Pago generado: $" + (celda.dataset.pago || "0");
 
-          // === Mostrar pagos asociados ===
+          // Mostrar pagos asociados
           const tablaPagosBody = document.querySelector("#tablaPagosResumen tbody");
-          tablaPagosBody.innerHTML = ""; // Limpiar antes de llenar
+          tablaPagosBody.innerHTML = "";
 
           try {
             const token = localStorage.getItem("accessToken");
@@ -77,36 +78,73 @@ export function inicializarDelegacionClick() {
 
             if (resp.ok) {
               const citaDetallada = await resp.json();
-              const pagos = citaDetallada.pagos || [];
+              const pagosCitaActual = citaDetallada.pagos || [];
 
-              if (pagos.length > 0) {
-                pagos.forEach(pago => {
+              if (pagosCitaActual.length > 0) {
+                // Ordenar pagos: penalizaciones primero
+                const pagosOrdenados = pagosCitaActual.sort((a, b) => {
+                  if (a.tipoPago === "PENALIZACION" && b.tipoPago !== "PENALIZACION") return -1;
+                  if (a.tipoPago !== "PENALIZACION" && b.tipoPago === "PENALIZACION") return 1;
+                  return new Date(a.fecha) - new Date(b.fecha);
+                });
+
+                // Evitar duplicados exactos: mismo tipo + mismo motivo + misma fecha
+                const pagosMostrados = new Set();
+                const pagosFiltrados = pagosOrdenados.filter(p => {
+                  const key = `${p.tipoPago}-${p.motivo}-${p.fecha}`;
+                  if (pagosMostrados.has(key)) return false;
+                  pagosMostrados.add(key);
+                  return true;
+                });
+
+                let total = 0;
+                let montoPenalizacion = 0;
+
+                // Renderizar pagos filtrados
+                pagosFiltrados.forEach(pago => {
+                  let montoMostrado = pago.montoTotal || 0;
+
+                  if (pago.tipoPago === "PENALIZACION") {
+                    montoPenalizacion += pago.montoTotal || 0;
+                    total += pago.montoTotal || 0;
+                  } else if (pago.tipoPago === "PAGO_NORMAL") {
+                    montoMostrado = Math.max(0, pago.montoTotal - montoPenalizacion);
+                    total += montoMostrado;
+                  } else {
+                    total += pago.montoTotal || 0;
+                  }
+
                   const fila = document.createElement("tr");
                   fila.innerHTML = `
-          <td>${pago.tipoPago || "-"}</td>
-          <td>$${pago.montoTotal?.toFixed(2) || "0.00"}</td>
-          <td>${new Date(pago.fecha).toLocaleString()}</td>
-          <td>${pago.motivo || "-"}</td>
-        `;
+                <td>${pago.tipoPago || "-"}</td>
+                <td>$${montoMostrado.toFixed(2)}</td>
+                <td>${new Date(pago.fecha).toLocaleString()}</td>
+                <td>${pago.motivo || "-"}</td>
+              `;
                   tablaPagosBody.appendChild(fila);
                 });
+
+                // Fila de total
+                const filaTotal = document.createElement("tr");
+                filaTotal.innerHTML = `
+              <td style="font-weight:bold;">TOTAL</td>
+              <td style="font-weight:bold;">$${total.toFixed(2)}</td>
+              <td colspan="2"></td>
+            `;
+                tablaPagosBody.appendChild(filaTotal);
+
               } else {
-                tablaPagosBody.innerHTML = `
-        <tr><td colspan="4" style="text-align:center;">No hay pagos registrados</td></tr>
-      `;
+                tablaPagosBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No hay pagos registrados</td></tr>`;
               }
+
             } else {
-              tablaPagosBody.innerHTML = `
-      <tr><td colspan="4" style="text-align:center;">Error al cargar pagos</td></tr>
-    `;
+              tablaPagosBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">Error al cargar pagos</td></tr>`;
             }
+
           } catch (error) {
             console.error("Error al obtener pagos:", error);
-            tablaPagosBody.innerHTML = `
-    <tr><td colspan="4" style="text-align:center;">No se pudieron cargar los pagos</td></tr>
-  `;
+            tablaPagosBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No se pudieron cargar los pagos</td></tr>`;
           }
-
 
         } else {
           // Mostrar formulario para editar
@@ -126,7 +164,7 @@ export function inicializarDelegacionClick() {
         }
       } else {
         // Nueva cita
-        formContainer.style.display = "block"; // mostrar formulario con título
+        formContainer.style.display = "block";
         resumen.style.display = "none";
 
         document.getElementById("idCita").value = "";
@@ -143,5 +181,8 @@ export function inicializarDelegacionClick() {
       console.error(err);
       alert("No se pudieron cargar psicólogos o pacientes");
     }
+
   });
 }
+
+
