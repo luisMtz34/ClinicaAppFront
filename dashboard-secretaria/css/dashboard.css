@@ -323,5 +323,18 @@ body {
   flex-direction: column; /* vertical */
   gap: 20px; /* espacio entre formulario y resumen */
 }
+#btnIrPagos {
+  background-color: #45c482;
+}
+
+#btnIrPagos:hover {
+  background-color: #209653;
+}
+#btnCerrarModal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto 0 auto;
+}
 
 

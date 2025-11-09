@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pagos de cita</title>
+    <link rel="stylesheet" href="./css/pagos.css">
+</head>
+
+<body>
+    <h1>Pagos de la cita</h1>
+
+    <!-- NUEVO: Mostrar info de paciente y psicólogo -->
+    <div id="infoCita" style="margin-bottom: 20px; font-weight: bold;"></div>
+
+    <div id="listaPagos"></div>
+
+    <!-- Modal -->
+    <div id="modalPago" class="modal">
+        <div class="modal-content">
+            <h2>Registrar pago</h2>
+            <form id="formPago">
+                <label>Monto total:</label>
+                <input type="number" name="montoTotal" required>
+
+                <label>Penalización:</label>
+                <input type="number" name="penalizacion" value="0">
+
+                <label>Motivo:</label>
+                <input type="text" name="motivo">
+
+                <label>Tipo de pago:</label>
+                <select name="tipoPago" id="tipoPago" required>
+                    <option value="">Seleccionar tipo de pago</option>
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="TRANSFERENCIA">Transferencia</option>
+                    <option value="TARJETA">Tarjeta</option>
+                    <option value="NO_DETERMINADO">No determinado</option>
+                </select>
+
+
+                <label>Observaciones:</label>
+                <textarea name="observaciones"></textarea>
+
+                <div class="botones">
+                    <button type="submit" id="btnConfirmar">Confirmar pago</button>
+                    <button type="button" id="btnCancelar">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="./js/pagos.js"></script>
+</body>
+
+</html>

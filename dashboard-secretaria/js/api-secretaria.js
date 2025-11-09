@@ -128,7 +128,6 @@ export async function registrarOActualizarCita(e) {
                 text: "El paciente ya tiene una cita registrada en esta fecha.",
                 confirmButtonColor: "#f39c12"
             });
-
             return;
         }
 
@@ -137,14 +136,53 @@ export async function registrarOActualizarCita(e) {
         if (esEdicion) {
             const nuevoEstado = document.getElementById("estado").value;
             const estadoOriginal = document.getElementById("estado").dataset.original;
-            if (nuevoEstado !== estadoOriginal) {
-                await fetch(`${BASE_URL}/citas/${idCita}/estado?estado=${nuevoEstado}`, {
-                    method: "PUT", // 🔹 Cambiado de POST a PUT
-                    headers: { "Authorization": "Bearer " + token }
+
+            // ✅ Si se cambió el estado a ATENDIDA
+            if (nuevoEstado === "ATENDIDA" && nuevoEstado !== estadoOriginal) {
+                const confirmar = await Swal.fire({
+                    icon: "info",
+                    title: "Cita atendida",
+                    text: "Vas a marcar esta cita como atendida. Se generará el pago correspondiente.",
+                    showCancelButton: true,
+                    confirmButtonText: "Continuar",
+                    cancelButtonText: "Cancelar",
                 });
 
+                if (confirmar.isConfirmed) {
+                    // 🔹 Guardar los demás cambios de la cita antes de registrar pago
+                    await fetch(`${BASE_URL}/citas/${idCita}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + token
+                        },
+                        body: JSON.stringify(cita)
+                    });
 
+                    // 🔹 Redirigir a la pantalla de pagos
+                    Swal.fire({
+                        icon: "success",
+                        title: "Cita actualizada",
+                        text: "Ahora registra el pago correspondiente.",
+                        confirmButtonText: "Ir a pagos"
+                    }).then(() => {
+                        window.location.href = `../dashboard-pagos/pagos.html?idCita=${idCita}`;
+                    });
+
+                    return; // 🚫 Detener el flujo normal aquí
+                } else {
+                    return; // Si el usuario cancela, no hace nada
+                }
             }
+
+            // 🔹 Si no se cambió a ATENDIDA, se actualiza el estado normalmente
+            if (nuevoEstado !== estadoOriginal) {
+                await fetch(`${BASE_URL}/citas/${idCita}/estado?estado=${nuevoEstado}`, {
+                    method: "PUT",
+                    headers: { "Authorization": "Bearer " + token }
+                });
+            }
+
             Swal.fire({
                 toast: true,
                 position: 'top-end',
@@ -156,16 +194,16 @@ export async function registrarOActualizarCita(e) {
             });
 
         } else {
+            // 🔹 Nueva cita registrada
             Swal.fire({
                 icon: "success",
                 title: "✅ Cita registrada correctamente",
                 text: "Se ha guardado la cita con éxito.",
-                timer: 2000,         // Se cierra automáticamente
+                timer: 2000,
                 showConfirmButton: false,
-                position: "top-end", // opcional, estilo toast
-                toast: true          // estilo tipo notificación
+                position: "top-end",
+                toast: true
             });
-
         }
 
         document.getElementById("modalRegistrarCita").style.display = "none";
