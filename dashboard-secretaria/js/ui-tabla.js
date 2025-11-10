@@ -31,23 +31,19 @@ export function inicializarDelegacionClick() {
   const btnGuardarCita = document.getElementById("btnGuardarCita");
   const btnIrPagos = document.getElementById("btnIrPagos");
 
-  // 🔹 Listener único: cerrar modal y restaurar formulario
   btnCerrar.addEventListener("click", () => {
     modal.style.display = "none";
-
-    // Rehabilitar todos los campos
-    form.querySelectorAll("input, select, textarea").forEach(campo => {
-      campo.disabled = false;
-    });
-
-    // Restaurar estado inicial de los botones
-    btnGuardarCita.style.display = "inline-block";
-    btnIrPagos.style.display = "none";
-    btnCerrar.textContent = "Cancelar";
-    btnCerrar.style.margin = "initial";
+    resetearModal(form, btnGuardarCita, btnIrPagos, btnCerrar);
   });
 
-  // 🔹 Evento al hacer clic en una celda de la tabla
+  // 🔹 Cerrar modal al hacer clic fuera
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+      resetearModal(form, btnGuardarCita, btnIrPagos, btnCerrar);
+    }
+  });
+
   nuevo.addEventListener("click", async (e) => {
     const celda = e.target.closest("td[data-consultorio]");
     if (!celda) return;
@@ -69,10 +65,7 @@ export function inicializarDelegacionClick() {
       document.getElementById("hora").value = hora;
 
       if (idCita) {
-        // --- Editar cita existente ---
-        const estado = celda.dataset.estado || "ACTIVO";
-        const estadoSelect = document.getElementById("estado");
-        const estadoOriginal = estado;
+        const estadoOriginal = celda.dataset.estado || "ACTIVO";
 
         formContainer.style.display = "block";
         document.getElementById("idCita").value = idCita;
@@ -83,38 +76,39 @@ export function inicializarDelegacionClick() {
         document.getElementById("observaciones").value = celda.dataset.observaciones || "";
         document.getElementById("psicologo").value = celda.dataset.psicologoId || "";
         document.getElementById("paciente").value = celda.dataset.pacienteId || "";
-        estadoSelect.value = estado;
-        estadoSelect.dataset.original = estado;
+        document.getElementById("estado").value = estadoOriginal;
 
-        // --- Lógica visual solo si ya fue ATENDIDA ---
+        // 🔹 Reset visual
+        form.querySelectorAll("input, select, textarea").forEach(campo => campo.disabled = false);
+        btnGuardarCita.style.display = "inline-block";
+        btnIrPagos.style.display = "none";
+        btnCerrar.textContent = "Cancelar";
+        btnCerrar.style.margin = "initial";
+
+        // --- Lógica según estado ---
         if (estadoOriginal === "ATENDIDA") {
-          btnIrPagos.style.display = "inline-block";
-          btnIrPagos.textContent = "Ver pago";
-
-          // Desactivar campos
-          form.querySelectorAll("input, select, textarea").forEach(campo => {
-            campo.disabled = true;
-          });
-
-          // Ocultar actualizar y dejar solo cerrar
+          form.querySelectorAll("input, select, textarea").forEach(campo => campo.disabled = true);
           btnGuardarCita.style.display = "none";
           btnCerrar.textContent = "Cerrar";
           btnCerrar.style.margin = "0 auto";
-        } else {
-          btnIrPagos.style.display = "none";
-          btnGuardarCita.style.display = "inline-block";
-          btnCerrar.textContent = "Cancelar";
-          btnCerrar.style.margin = "initial";
+          btnIrPagos.style.display = "inline-block";
+          btnIrPagos.textContent = "Ver pago";
+          btnIrPagos.onclick = () => {
+            window.location.href = `/dashboard-pagos/pagos.html?idCita=${idCita}&modo=ver`;
+          };
+        } else if (estadoOriginal === "NO_ASISTIO") {
+          form.querySelectorAll("input, select, textarea").forEach(campo => campo.disabled = true);
+          btnGuardarCita.style.display = "none";
+          btnCerrar.textContent = "Cerrar";
+          btnCerrar.style.margin = "0 auto";
+          btnIrPagos.style.display = "inline-block";
+          btnIrPagos.textContent = "Registrar penalización";
+          btnIrPagos.onclick = () => {
+            window.location.href = `/dashboard-pagos/pagos.html?idCita=${idCita}&modo=penalizacion`;
+          };
         }
 
-        // --- Acción del botón de pago ---
-        btnIrPagos.onclick = () => {
-          const idCitaActual = document.getElementById("idCita").value;
-          window.location.href = `/dashboard-pagos/pagos.html?idCita=${idCitaActual}&modo=ver`;
-        };
-
       } else {
-        // --- Nueva cita ---
         formContainer.style.display = "block";
         document.getElementById("idCita").value = "";
         btnGuardarCita.textContent = "Guardar";
@@ -128,6 +122,13 @@ export function inicializarDelegacionClick() {
   });
 }
 
+function resetearModal(form, btnGuardarCita, btnIrPagos, btnCerrar) {
+  form.querySelectorAll("input, select, textarea").forEach(campo => campo.disabled = false);
+  btnGuardarCita.style.display = "inline-block";
+  btnIrPagos.style.display = "none";
+  btnCerrar.textContent = "Cancelar";
+  btnCerrar.style.margin = "initial";
+}
 
 
 

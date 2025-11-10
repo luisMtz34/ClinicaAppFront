@@ -32,33 +32,46 @@
     </main>
 
     <!-- ===== Modal Registrar Pago ===== -->
+    <!-- ===== Modal Registrar Pago ===== -->
     <div id="modalPago" class="modal">
         <div class="modal-content">
             <h2>Registrar pago</h2>
             <form id="formPago">
-                <label>Monto total:</label>
-                <input type="number" name="montoTotal" required>
+                <div class="campo">
+                    <label>Monto total:</label>
+                    <input type="number" name="montoTotal" required>
+                </div>
 
-                <label>Comisión clínica:</label>
-                <input type="number" name="comisionClinica" value="0" required>
+                <div class="campo">
+                    <label>Comisión clínica:</label>
+                    <input type="number" name="comisionClinica" value="0" required>
+                </div>
 
-                <label>Penalización:</label>
-                <input type="number" name="penalizacion" value="0" disabled>
+                <div class="campo">
+                    <label>Penalización:</label>
+                    <input type="number" name="penalizacion" value="0" disabled>
+                </div>
 
-                <label>Motivo:</label>
-                <input type="text" name="motivo">
+                <div class="campo">
+                    <label>Motivo:</label>
+                    <input type="text" name="motivo">
+                </div>
 
-                <label>Tipo de pago:</label>
-                <select name="tipoPago" id="tipoPago" required>
-                    <option value="">Seleccionar tipo de pago</option>
-                    <option value="EFECTIVO">Efectivo</option>
-                    <option value="TRANSFERENCIA">Transferencia</option>
-                    <option value="TARJETA">Tarjeta</option>
-                    <option value="NO_DETERMINADO">No determinado</option>
-                </select>
+                <div class="campo">
+                    <label>Tipo de pago:</label>
+                    <select name="tipoPago" id="tipoPago" required>
+                        <option value="">Seleccionar tipo de pago</option>
+                        <option value="EFECTIVO">Efectivo</option>
+                        <option value="TRANSFERENCIA">Transferencia</option>
+                        <option value="TARJETA">Tarjeta</option>
+                        <option value="NO_DETERMINADO">No determinado</option>
+                    </select>
+                </div>
 
-                <label>Observaciones:</label>
-                <textarea name="observaciones"></textarea>
+                <div class="campo">
+                    <label>Observaciones:</label>
+                    <textarea name="observaciones"></textarea>
+                </div>
 
                 <div class="botones">
                     <button type="submit" id="btnConfirmar">Confirmar pago</button>
@@ -68,14 +81,16 @@
         </div>
     </div>
 
+
+
     <script src="./js/pagos.js"></script>
-<script>
-    // Botón “Inicio” que regresa al dashboard
-    const btnSalir = document.getElementById('btnSalir');
-    btnSalir?.addEventListener('click', () => {
-        window.location.href = "../dashboard-secretaria/home-secretaria.html";
-    });
-</script>
+    <script>
+        // Botón “Inicio” que regresa al dashboard
+        const btnSalir = document.getElementById('btnSalir');
+        btnSalir?.addEventListener('click', () => {
+            window.location.href = "../dashboard-secretaria/home-secretaria.html";
+        });
+    </script>
 
 </body>
 
