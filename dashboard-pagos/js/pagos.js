@@ -88,13 +88,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             form.motivo.value = "Penalización por inasistencia";
             form.penalizacion.value = 200;
             form.penalizacion.disabled = false;
-            modal.style.display = "block"; // ✅ solo mostrar en penalización
+            modal.style.display = "flex"; // ✅ solo mostrar en penalización
         }
         else if (modo !== "ver") {
             // Registro normal de pago
             form.montoTotal.value = 500;
             form.motivo.value = "Cita atendida";
-            modal.style.display = "block"; // ✅ solo mostrar en registro
+            modal.style.display = "flex"; // ✅ solo mostrar en registro
         }
         else {
             // ✅ Si es modo ver → NO mostrar el modal
