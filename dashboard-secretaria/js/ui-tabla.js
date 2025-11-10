@@ -102,11 +102,35 @@ export function inicializarDelegacionClick() {
           btnCerrar.textContent = "Cerrar";
           btnCerrar.style.margin = "0 auto";
           btnIrPagos.style.display = "inline-block";
-          btnIrPagos.textContent = "Registrar penalización";
-          btnIrPagos.onclick = () => {
-            window.location.href = `/dashboard-pagos/pagos.html?idCita=${idCita}&modo=penalizacion`;
-          };
+
+          try {
+            const token = localStorage.getItem("accessToken");
+            const resp = await fetch(`http://localhost:8082/pagos/cita/${idCita}`, {
+              headers: { Authorization: "Bearer " + token },
+            });
+            const pagos = await resp.json();
+
+            const yaTienePenalizacion = pagos.some(p => p.tipoPago === "PENALIZACION");
+
+            if (yaTienePenalizacion) {
+              btnIrPagos.textContent = "Ver penalización";
+              btnIrPagos.onclick = () => {
+                window.location.href = `/dashboard-pagos/pagos.html?idCita=${idCita}&modo=ver`;
+              };
+            } else {
+              btnIrPagos.textContent = "Registrar penalización";
+              btnIrPagos.onclick = () => {
+                window.location.href = `/dashboard-pagos/pagos.html?idCita=${idCita}&modo=penalizacion`;
+              };
+            }
+          } catch (err) {
+            console.error("Error al verificar penalización:", err);
+          }
         }
+
+
+
+
 
       } else {
         formContainer.style.display = "block";

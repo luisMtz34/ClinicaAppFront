@@ -133,11 +133,12 @@ export async function registrarOActualizarCita(e) {
 
         if (!res.ok) throw new Error("Error al guardar la cita");
 
+        // --- Dentro de registrarOActualizarCita ---
         if (esEdicion) {
             const nuevoEstado = document.getElementById("estado").value;
             const estadoOriginal = document.getElementById("estado").dataset.original;
 
-            // ✅ Si se cambió el estado a ATENDIDA
+            // --- ATENDIDA ---
             if (nuevoEstado === "ATENDIDA" && nuevoEstado !== estadoOriginal) {
                 const confirmar = await Swal.fire({
                     icon: "info",
@@ -148,34 +149,65 @@ export async function registrarOActualizarCita(e) {
                     cancelButtonText: "Cancelar",
                 });
 
-                if (confirmar.isConfirmed) {
-                    // 🔹 Guardar los demás cambios de la cita antes de registrar pago
-                    await fetch(`${BASE_URL}/citas/${idCita}`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Bearer " + token
-                        },
-                        body: JSON.stringify(cita)
-                    });
+                if (!confirmar.isConfirmed) return;
 
-                    // 🔹 Redirigir a la pantalla de pagos
-                    Swal.fire({
-                        icon: "success",
-                        title: "Cita actualizada",
-                        text: "Ahora registra el pago correspondiente.",
-                        confirmButtonText: "Ir a pagos"
-                    }).then(() => {
-                        window.location.href = `../dashboard-pagos/pagos.html?idCita=${idCita}`;
-                    });
+                // ✅ Guardar cita y estado
+                await fetch(`${BASE_URL}/citas/${idCita}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+                    body: JSON.stringify({ ...cita, estado: nuevoEstado })
+                });
 
-                    return; // 🚫 Detener el flujo normal aquí
-                } else {
-                    return; // Si el usuario cancela, no hace nada
-                }
+                Swal.fire({
+                    icon: "success",
+                    title: "Cita actualizada",
+                    text: "Ahora registra el pago correspondiente.",
+                    confirmButtonText: "Ir a pagos"
+                }).then(() => {
+                    window.location.href = `../dashboard-pagos/pagos.html?idCita=${idCita}`;
+                });
+
+                return;
             }
 
-            // 🔹 Si no se cambió a ATENDIDA, se actualiza el estado normalmente
+            // --- NO_ASISTIO ---
+            if (nuevoEstado === "NO_ASISTIO" && nuevoEstado !== estadoOriginal) {
+                const confirmar = await Swal.fire({
+                    icon: "warning",
+                    title: "Cita marcada como inasistencia",
+                    text: "Se generará la penalización correspondiente para esta cita.",
+                    showCancelButton: true,
+                    confirmButtonText: "Continuar",
+                    cancelButtonText: "Cancelar",
+                });
+
+                if (!confirmar.isConfirmed) return;
+
+                await fetch(`${BASE_URL}/citas/${idCita}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+                    body: JSON.stringify({ ...cita, estado: nuevoEstado })
+                });
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Cita actualizada",
+                    text: "Ahora registra la penalización correspondiente.",
+                    confirmButtonText: "Ir a penalización"
+                }).then(() => {
+                    window.location.href = `../dashboard-pagos/pagos.html?idCita=${idCita}&modo=penalizacion`;
+                });
+
+                return;
+            }
+
+            // --- Otros cambios de estado normales ---
             if (nuevoEstado !== estadoOriginal) {
                 await fetch(`${BASE_URL}/citas/${idCita}/estado?estado=${nuevoEstado}`, {
                     method: "PUT",
@@ -192,8 +224,9 @@ export async function registrarOActualizarCita(e) {
                 timer: 2000,
                 timerProgressBar: true
             });
+        }
 
-        } else {
+        else {
             // 🔹 Nueva cita registrada
             Swal.fire({
                 icon: "success",

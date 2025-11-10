@@ -8,67 +8,64 @@ document.addEventListener("DOMContentLoaded", async () => {
     const listaPagos = document.getElementById("listaPagos");
     const btnCancelar = document.getElementById("btnCancelar");
 
-function ajustarCamposSegunModo(form, modo) {
-    const campoComision = form.querySelector("[name='comisionClinica']").closest(".campo");
-    const campoTipoPago = form.querySelector("[name='tipoPago']").closest(".campo");
-    const campoPenalizacion = form.querySelector("[name='penalizacion']").closest(".campo");
-    const campoMonto = form.querySelector("[name='montoTotal']").closest(".campo");
-    const campoMotivo = form.querySelector("[name='motivo']").closest(".campo");
-    const campoObs = form.querySelector("[name='observaciones']").closest(".campo");
-    const tipoPagoSelect = form.querySelector("[name='tipoPago']");
-    const comisionInput = form.querySelector("[name='comisionClinica']");
+    function ajustarCamposSegunModo(form, modo) {
+        const campoComision = form.querySelector("[name='comisionClinica']").closest(".campo");
+        const campoTipoPago = form.querySelector("[name='tipoPago']").closest(".campo");
+        const campoPenalizacion = form.querySelector("[name='penalizacion']").closest(".campo");
+        const campoMonto = form.querySelector("[name='montoTotal']").closest(".campo");
+        const campoMotivo = form.querySelector("[name='motivo']").closest(".campo");
+        const campoObs = form.querySelector("[name='observaciones']").closest(".campo");
+        const tipoPagoSelect = form.querySelector("[name='tipoPago']");
+        const comisionInput = form.querySelector("[name='comisionClinica']");
 
-    // ✅ Si no hay modo, lo tratamos como "registro" por defecto
-    modo = (modo || "registro").toLowerCase();
+        // ✅ Si no hay modo, lo tratamos como "registro" por defecto
+        modo = (modo || "registro").toLowerCase();
 
-    if (modo === "penalizacion") {
-        // Mostrar solo estos
-        campoMonto.classList.remove("oculto");
-        campoMotivo.classList.remove("oculto");
-        campoObs.classList.remove("oculto");
+        if (modo === "penalizacion") {
+            // Mostrar solo estos
+            campoMonto.classList.remove("oculto");
+            campoMotivo.classList.remove("oculto");
+            campoObs.classList.remove("oculto");
 
-        // Ocultar los demás
-        campoComision.classList.add("oculto");
-        campoTipoPago.classList.add("oculto");
-        campoPenalizacion.classList.add("oculto");
+            // Ocultar los demás
+            campoComision.classList.add("oculto");
+            campoTipoPago.classList.add("oculto");
+            campoPenalizacion.classList.add("oculto");
 
-        // Quitar required de los ocultos
-        tipoPagoSelect.removeAttribute("required");
-        comisionInput.removeAttribute("required");
+            // Quitar required de los ocultos
+            tipoPagoSelect.removeAttribute("required");
+            comisionInput.removeAttribute("required");
 
-        // Fijar valores
-        tipoPagoSelect.value = "PENALIZACION";
-        comisionInput.value = 0;
-    } 
-    else if (modo === "atendida") {
-        // Mostrar estos
-        campoMonto.classList.remove("oculto");
-        campoComision.classList.remove("oculto");
-        campoMotivo.classList.remove("oculto");
-        campoTipoPago.classList.remove("oculto");
-        campoObs.classList.remove("oculto");
+            // Fijar valores
+            tipoPagoSelect.value = "PENALIZACION";
+            comisionInput.value = 0;
+        }
+        else if (modo === "atendida") {
+            // Mostrar estos
+            campoMonto.classList.remove("oculto");
+            campoComision.classList.remove("oculto");
+            campoMotivo.classList.remove("oculto");
+            campoTipoPago.classList.remove("oculto");
+            campoObs.classList.remove("oculto");
 
-        // Ocultar penalización
-        campoPenalizacion.classList.add("oculto");
+            // Ocultar penalización
+            campoPenalizacion.classList.add("oculto");
 
-        // Restaurar required
-        tipoPagoSelect.setAttribute("required", "true");
-        comisionInput.setAttribute("required", "true");
+            // Restaurar required
+            tipoPagoSelect.setAttribute("required", "true");
+            comisionInput.setAttribute("required", "true");
 
-        tipoPagoSelect.value = "";
-    } 
-    else {
-        // Fallback
-        campoComision.classList.remove("oculto");
-        campoTipoPago.classList.remove("oculto");
-        campoPenalizacion.classList.add("oculto");
-        tipoPagoSelect.setAttribute("required", "true");
-        comisionInput.setAttribute("required", "true");
+            tipoPagoSelect.value = "";
+        }
+        else {
+            // Fallback
+            campoComision.classList.remove("oculto");
+            campoTipoPago.classList.remove("oculto");
+            campoPenalizacion.classList.add("oculto");
+            tipoPagoSelect.setAttribute("required", "true");
+            comisionInput.setAttribute("required", "true");
+        }
     }
-}
-
-
-
 
 
     const token = localStorage.getItem("accessToken");
@@ -140,20 +137,28 @@ function ajustarCamposSegunModo(form, modo) {
             }
 
             // 2️⃣ Manejo de estado según el modo
+            // 2️⃣ Manejo de estado según el modo
             let nuevoEstado;
             let mensaje;
 
             if (modo === "penalizacion") {
-                // 👇 En penalización NO se cambia el estado
                 nuevoEstado = "NO_ASISTIO";
                 mensaje = "⚠️ Penalización registrada correctamente por inasistencia.";
+
+                // ✅ Aquí SÍ actualizamos el estado después de registrar la penalización
+                await fetch(
+                    `http://localhost:8082/secretaria/citas/${idCita}/estado?estado=${nuevoEstado}`,
+                    {
+                        method: "PUT",
+                        headers: { Authorization: "Bearer " + token },
+                    }
+                );
+
             } else {
                 nuevoEstado = "ATENDIDA";
                 mensaje = "✅ Pago registrado correctamente y cita marcada como atendida.";
-            }
 
-            // Solo actualizar estado si NO es penalización
-            if (modo !== "penalizacion") {
+                // ✅ Mantener el flujo normal
                 await fetch(
                     `http://localhost:8082/secretaria/citas/${idCita}/estado?estado=${nuevoEstado}`,
                     {
@@ -162,6 +167,7 @@ function ajustarCamposSegunModo(form, modo) {
                     }
                 );
             }
+
 
             alert(mensaje);
             await cargarPagos(true);
