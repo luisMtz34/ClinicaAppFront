@@ -19,16 +19,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // Solo mostrar el modal si se va a registrar un pago
-    if (modo !== "ver") {
+    // Mostrar el modal solo si vienes con una cita (modo registro)
+    if (modo !== "ver" && idCita) {
         modal.style.display = "block";
         form.montoTotal.value = 500;
         form.motivo.value = "Cita atendida";
     } else {
-        // En modo ver, ocultamos el modal y el formulario
+        // En modo ver o al abrir pagos.html sin parámetros, ocultamos todo
         modal.style.display = "none";
         form.style.display = "none";
     }
+
 
     // Botón cancelar
     btnCancelar.addEventListener("click", () => {
