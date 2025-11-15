@@ -6,11 +6,16 @@ import { cargarCitas } from "./api-secretaria.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("accessToken");
-  
+
   if (!token) {
     window.location.href = "../index.html";
     return;
   }
+
+  document.getElementById("btnVerTodas").addEventListener("click", () => {
+    window.location.href = "../dashboard-ver-citas/verCitas.html";
+  });
+
 
   const btnAnterior = document.getElementById("btnAnterior");
   const btnSiguiente = document.getElementById("btnSiguiente");
@@ -24,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   inicializarDelegacionClick();
   inicializarModal();
   await cargarCitas(token, formatearFechaISO(fechaActual));
-  
+
   // === Botones ===
   document.getElementById("btnSalir").addEventListener("click", () => {
     localStorage.removeItem("accessToken");

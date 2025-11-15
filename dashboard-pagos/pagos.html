@@ -24,18 +24,91 @@
     </header>
 
     <main class="content">
-        <!-- Info de la cita -->
+
+        <!-- ===== FILTROS ===== -->
+        <!-- ===== FILTROS PAGOS ===== -->
+        <div class="filtros-container">
+
+            <div class="filtro">
+                <label for="filtroPsicologoPago">Psicólogo:</label>
+                <select id="filtroPsicologoPago">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
+            <div class="filtro">
+                <label for="filtroPacientePago">Paciente:</label>
+                <select id="filtroPacientePago">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
+            <div class="filtro">
+                <label for="filtroFechaPago">Fecha (cita):</label>
+                <input type="date" id="filtroFechaPago">
+            </div>
+
+            <div class="filtro">
+                <label for="filtroHoraPago">Hora:</label>
+                <select id="filtroHoraPago">
+                    <option value="">Todas</option>
+                    <option value="09:00">09:00</option>
+                    <option value="10:00">10:00</option>
+                    <option value="11:00">11:00</option>
+                    <option value="12:00">12:00</option>
+                    <option value="13:00">13:00</option>
+                    <option value="15:00">15:00</option>
+                    <option value="16:00">16:00</option>
+                    <option value="17:00">17:00</option>
+                    <option value="18:00">18:00</option>
+                    <option value="19:00">19:00</option>
+                    <option value="20:00">20:00</option>
+                </select>
+            </div>
+
+            <div class="filtro">
+                <label for="filtroTipoPago">Tipo de pago:</label>
+                <select id="filtroTipoPago">
+                    <option value="">Todos</option>
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="TRANSFERENCIA">Transferencia</option>
+                    <option value="TARJETA">Tarjeta</option>
+                    <option value="PENALIZACION">Penalización</option>
+                </select>
+            </div>
+
+            <div class="filtro">
+                <label for="filtroPenalizacion">Penalización:</label>
+                <select id="filtroPenalizacion">
+                    <option value="">Todas</option>
+                    <option value="true">Con penalización</option>
+                    <option value="false">Sin penalización</option>
+                </select>
+            </div>
+
+            <div class="filtros-botones">
+                <button id="btnRestablecerPagos" class="btn-filtrar reset">Restablecer</button>
+                <button id="btnBuscarPagos" class="btn-filtrar">Buscar</button>
+            </div>
+
+        </div>
+
+
         <div id="infoCita" style="margin-bottom: 20px; font-weight: bold;"></div>
 
-        <!-- Lista de pagos -->
-        <div id="listaPagos"></div>
+        <!-- ===== TABLA DE PAGOS ===== -->
+        <div id="listaPagos" class="table-container">
+            <p>Cargando pagos...</p>
+        </div>
+
     </main>
 
-
+    <!-- ===== MODAL ===== -->
     <div id="modalPago" class="modal">
         <div class="modal-content">
             <h2>Registrar pago</h2>
             <form id="formPago">
+
                 <div class="campo">
                     <label>Monto total:</label>
                     <input type="number" name="montoTotal" required>
@@ -51,7 +124,6 @@
                     <input type="number" name="penalizacion" value="0">
                 </div>
 
-
                 <div class="campo">
                     <label>Motivo:</label>
                     <input type="text" name="motivo">
@@ -60,11 +132,11 @@
                 <div class="campo">
                     <label>Tipo de pago:</label>
                     <select name="tipoPago" id="tipoPago" required>
-                        <option value="">Seleccionar tipo de pago</option>
                         <option value="EFECTIVO">Efectivo</option>
                         <option value="TRANSFERENCIA">Transferencia</option>
                         <option value="TARJETA">Tarjeta</option>
-                        <option value="NO_DETERMINADO">No determinado</option>
+                        <option value="PENALIZACION">Penalización</option>
+
                     </select>
                 </div>
 
@@ -81,11 +153,9 @@
         </div>
     </div>
 
-
-
     <script src="./js/pagos.js"></script>
+
     <script>
-        // Botón “Inicio” que regresa al dashboard
         const btnSalir = document.getElementById('btnSalir');
         btnSalir?.addEventListener('click', () => {
             window.location.href = "../dashboard-secretaria/home-secretaria.html";

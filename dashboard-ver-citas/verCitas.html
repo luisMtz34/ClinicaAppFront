@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Todas las Citas</title>
+  <link rel="stylesheet" href="css/verCitas.css">
+</head>
+
+<body>
+  <header class="navbar">
+    <div class="header-left">
+      <h1>Sistema de Psicología</h1>
+    </div>
+    <nav class="header-right">
+      <ul>
+        <li><a href="../dashboar-paciente/paciente.html" class="btn-nav">Pacientes</a></li>
+        <li><a href="../dashboard-psicologo/psicologos.html" class="btn-nav">Psicólogos</a></li>
+        <li><a href="../dashboard-secretaria/home-secretaria.html" class="btn-nav btn-inicio">Inicio</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="content">
+    <h2>Listado de Citas</h2>
+
+
+    <!-- 📌 Filtros de búsqueda -->
+    <div class="filtros-container">
+
+      <div class="filtro">
+        <label for="filtroEstado">Estado:</label>
+        <select id="filtroEstado">
+          <option value="">Todos</option>
+          <option value="ACTIVO">Activo</option>
+          <option value="CONFIRMADA">Confirmada</option>
+          <option value="ATENDIDA">Atendida</option>
+          <option value="CANCELADA">Cancelada</option>
+          <option value="NO_ASISTIO">No asistió</option>
+        </select>
+      </div>
+
+      <div class="filtro">
+        <label for="filtroConsultorio">Consultorio:</label>
+        <select id="filtroConsultorio">
+          <option value="">Todos</option>
+          <option value="C1">Consultorio 1</option>
+          <option value="C2">Consultorio 2</option>
+          <option value="C3">Consultorio 3</option>
+          <option value="C4">Consultorio 4</option>
+        </select>
+
+      </div>
+
+      <div class="filtro">
+        <label for="filtroPsicologo">Psicólogo:</label>
+        <select id="filtroPsicologo">
+          <option value="">Todos</option>
+          <!-- Se llenará dinámicamente desde JS -->
+        </select>
+      </div>
+      <div class="filtro">
+        <label for="filtroPaciente">Paciente:</label>
+        <select id="filtroPaciente">
+          <option value="">Todos</option>
+          <!-- Se llenará dinámicamente -->
+        </select>
+      </div>
+
+      <div class="filtro">
+        <label for="filtroFecha">Fecha:</label>
+        <input type="date" id="filtroFecha">
+      </div>
+
+      <div class="filtro">
+        <label for="filtroTipo">Tipo:</label>
+        <select id="filtroTipo">
+          <option value="">Todos</option>
+          <option value="PRIMERA_VEZ">Primera vez</option>
+          <option value="SUBSECUENTE">Subsecuente</option>
+        </select>
+      </div>
+
+      <div class="filtro">
+        <label for="filtroHora">Hora:</label>
+        <select id="filtroHora">
+          <option value="">Todas</option>
+          <option value="09:00">09:00</option>
+          <option value="10:00">10:00</option>
+          <option value="11:00">11:00</option>
+          <option value="12:00">12:00</option>
+          <option value="13:00">13:00</option>
+          <option value="15:00">15:00</option>
+          <option value="16:00">16:00</option>
+          <option value="17:00">17:00</option>
+          <option value="18:00">18:00</option>
+          <option value="19:00">19:00</option>
+          <option value="20:00">20:00</option>
+        </select>
+      </div>
+
+      <div class="filtros-botones">
+        <button id="btnRestablecer" class="btn-filtrar reset">Restablecer</button>
+
+        <button id="btnReporte">Generar reporte</button>
+
+        <div id="modalFormato" class="modal oculto">
+          <div class="modal-contenido">
+            <h3>Selecciona el formato del reporte</h3>
+            <button id="btnPdf">PDF</button>
+            <button id="btnExcel">Excel</button>
+            <button id="btnCerrarModal">Cancelar</button>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+
+    <div id="contenedorTabla" class="table-container">
+      <p>Cargando citas...</p>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script type="module" src="./js/verCitas.js"></script>
+</body>
+
+</html>
