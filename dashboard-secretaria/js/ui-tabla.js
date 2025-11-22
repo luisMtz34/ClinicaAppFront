@@ -58,9 +58,13 @@ export function inicializarDelegacionClick() {
       await cargarListas();
       form.reset();
 
+      const inputFecha = form.elements["fecha"];
+      const inputHora = form.elements["hora"];
+      const estadoSelect = form.elements["estado"];
+
       document.getElementById("consultorioSeleccionado").value = consultorio;
-      document.getElementById("fecha").value = fecha;
-      document.getElementById("hora").value = hora;
+      inputFecha.value = fecha;
+      inputHora.value = hora;
 
       if (idCita) {
         const estadoOriginal = celda.dataset.estado || "ACTIVO";
@@ -74,13 +78,36 @@ export function inicializarDelegacionClick() {
         document.getElementById("observaciones").value = celda.dataset.observaciones || "";
         document.getElementById("psicologo").value = celda.dataset.psicologoId || "";
         document.getElementById("paciente").value = celda.dataset.pacienteId || "";
-        document.getElementById("estado").value = estadoOriginal;
+        estadoSelect.value = estadoOriginal;
 
-        form.querySelectorAll("input, select, textarea").forEach(campo => campo.disabled = false);
+        // --- Habilitar todos los campos excepto fecha y hora ---
+        form.querySelectorAll("input, select, textarea").forEach(campo => {
+          if (campo.id !== "fecha" && campo.id !== "hora") campo.disabled = false;
+        });
+
         btnGuardarCita.style.display = "inline-block";
         btnIrPagos.style.display = "none";
         btnCerrar.textContent = "Cancelar";
         btnCerrar.style.margin = "initial";
+
+        // --- Función para habilitar/deshabilitar fecha y hora ---
+        const actualizarFechaHora = (estado) => {
+          if (estado === "REAGENDADA") {
+            inputFecha.disabled = false;
+            inputHora.disabled = false;
+          } else {
+            inputFecha.disabled = true;
+            inputHora.disabled = true;
+          }
+        };
+
+        // Aplicar inicialmente
+        actualizarFechaHora(estadoSelect.value);
+
+        // Escuchar cambios en el select de estado
+        estadoSelect.addEventListener("change", (e) => {
+          actualizarFechaHora(e.target.value);
+        });
 
         // --- Lógica según estado ---
         if (estadoOriginal === "ATENDIDA") {
@@ -91,18 +118,12 @@ export function inicializarDelegacionClick() {
           btnIrPagos.style.display = "inline-block";
           btnIrPagos.textContent = "Ver pago";
 
-          // ✅ Aquí NO abrimos el modal si presionan "Ver pago"
           btnIrPagos.onclick = (ev) => {
             ev.stopPropagation();
-            modal.style.display = "none"; // por si está abierto
+            modal.style.display = "none";
             window.location.href = `/dashboard-pagos/pagos.html?idCita=${idCita}&modo=ver`;
           };
-
-          // ✅ Aquí sí abrimos el modal para visualizar los datos
-          modal.style.display = "flex";
-        }
-
-        else if (estadoOriginal === "NO_ASISTIO") {
+        } else if (estadoOriginal === "NO_ASISTIO") {
           form.querySelectorAll("input, select, textarea").forEach(campo => campo.disabled = true);
           btnGuardarCita.style.display = "none";
           btnCerrar.textContent = "Cerrar";
@@ -121,34 +142,34 @@ export function inicializarDelegacionClick() {
               btnIrPagos.textContent = "Ver penalización";
               btnIrPagos.onclick = (ev) => {
                 ev.stopPropagation();
-                modal.style.display = "none"; // ✅ prevenir que se vea el modal
+                modal.style.display = "none";
                 window.location.href = `/dashboard-pagos/pagos.html?idCita=${idCita}&modo=ver`;
               };
             } else {
               btnIrPagos.textContent = "Registrar penalización";
               btnIrPagos.onclick = (ev) => {
                 ev.stopPropagation();
-                modal.style.display = "none"; // ✅ prevenir que se vea el modal
+                modal.style.display = "none";
                 window.location.href = `/dashboard-pagos/pagos.html?idCita=${idCita}&modo=penalizacion`;
               };
             }
-
-            // ✅ Solo abrimos el modal si no hay penalización registrada (para mostrar cita)
-            modal.style.display = "flex";
-
           } catch (err) {
             console.error("Error al verificar penalización:", err);
           }
         }
 
-
         modal.style.display = "flex";
       } else {
+        // Nueva cita
         formContainer.style.display = "block";
         document.getElementById("idCita").value = "";
         btnGuardarCita.textContent = "Guardar";
         document.getElementById("estadoContainer").style.display = "none";
         modal.style.display = "flex";
+
+        // Fecha y hora deshabilitadas por defecto
+        inputFecha.disabled = true;
+        inputHora.disabled = true;
       }
 
     } catch (err) {
@@ -156,6 +177,7 @@ export function inicializarDelegacionClick() {
       alert("No se pudieron cargar psicólogos o pacientes");
     }
   });
+
 }
 
 

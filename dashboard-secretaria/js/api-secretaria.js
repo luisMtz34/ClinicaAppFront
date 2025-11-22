@@ -44,7 +44,7 @@ export async function cargarCitas(token, fechaSeleccionada) {
 
         const citas = await response.json();
         const citasDelDia = citas.filter(c =>
-            c.fecha === fechaFiltro && c.estado !== "REAGENDADA"
+            c.fecha === fechaFiltro && c.estado !== "CANCELADA"
         );
 
         generarTablaHorarios();
@@ -136,7 +136,7 @@ export async function registrarOActualizarCita(e) {
 
         if (!res.ok) throw new Error("Error al guardar la cita");
 
-        // --- Dentro de registrarOActualizarCita ---
+        // --- EDICIÓN ---
         if (esEdicion) {
             const nuevoEstado = document.getElementById("estado").value;
             const estadoOriginal = document.getElementById("estado").dataset.original;
@@ -154,7 +154,6 @@ export async function registrarOActualizarCita(e) {
 
                 if (!confirmar.isConfirmed) return;
 
-                // ✅ Guardar cita y estado
                 await fetch(`${BASE_URL}/citas/${idCita}`, {
                     method: "PUT",
                     headers: {
@@ -176,8 +175,8 @@ export async function registrarOActualizarCita(e) {
                 return;
             }
 
-            // --- REAGENDADA ---
-            if (nuevoEstado === "REAGENDADA" && nuevoEstado !== estadoOriginal) {
+            // --- CANCELADA ---
+            if (nuevoEstado === "CANCELADA" && nuevoEstado !== estadoOriginal) {
                 await fetch(`${BASE_URL}/citas/${idCita}/estado?estado=${nuevoEstado}`, {
                     method: "PUT",
                     headers: { "Authorization": "Bearer " + token }
@@ -185,24 +184,35 @@ export async function registrarOActualizarCita(e) {
 
                 Swal.fire({
                     icon: "success",
-                    title: "Cita marcada como REAGENDADA",
+                    title: "Cita marcada como CANCELADA",
                     text: "El espacio ha quedado libre y la cita se guardó en historial.",
                     confirmButtonText: "Aceptar"
                 }).then(async () => {
+
                     document.getElementById("modalRegistrarCita").style.display = "none";
-                    await cargarCitas(token, cita.fecha);
+
+                    // Tomar la fecha del calendario si existe
+                    const fechaCalendario = document.getElementById("inputFechaCalendario")?.value;
+
+                    // Si no existe, usa la del formulario
+                    const fechaRecargar = fechaCalendario || document.getElementById("fecha").value;
+
+                    // Actualizar encabezado si existe
+                    const header = document.getElementById("fechaActual");
+                    if (header) header.textContent = formatDisplayDate(fechaRecargar);
+
+                    await cargarCitas(token, fechaRecargar);
                 });
 
                 return;
             }
 
-
-            // --- NO_ASISTIO ---
+            // --- NO ASISTIÓ ---
             if (nuevoEstado === "NO_ASISTIO" && nuevoEstado !== estadoOriginal) {
                 const confirmar = await Swal.fire({
                     icon: "warning",
                     title: "Cita marcada como inasistencia",
-                    text: "Se generará la penalización correspondiente para esta cita.",
+                    text: "Se generará la penalización correspondiente.",
                     showCancelButton: true,
                     confirmButtonText: "Continuar",
                     cancelButtonText: "Cancelar",
@@ -225,13 +235,14 @@ export async function registrarOActualizarCita(e) {
                     text: "Ahora registra la penalización correspondiente.",
                     confirmButtonText: "Ir a penalización"
                 }).then(() => {
-                    window.location.href = `../dashboard-pagos/pagos.html?idCita=${idCita}&modo=penalizacion`;
+                    window.location.href =
+                        `../dashboard-pagos/pagos.html?idCita=${idCita}&modo=penalizacion`;
                 });
 
                 return;
             }
 
-            // --- Otros cambios de estado normales ---
+            // --- OTROS CAMBIOS DE ESTADO ---
             if (nuevoEstado !== estadoOriginal) {
                 await fetch(`${BASE_URL}/citas/${idCita}/estado?estado=${nuevoEstado}`, {
                     method: "PUT",
@@ -250,8 +261,8 @@ export async function registrarOActualizarCita(e) {
             });
         }
 
+        // --- NUEVA CITA ---
         else {
-            // 🔹 Nueva cita registrada
             Swal.fire({
                 icon: "success",
                 title: "✅ Cita registrada correctamente",
@@ -263,11 +274,26 @@ export async function registrarOActualizarCita(e) {
             });
         }
 
+        // --- CERRAR MODAL Y RECARGAR TABLA ---
         document.getElementById("modalRegistrarCita").style.display = "none";
-        await cargarCitas(token, cita.fecha);
+
+        // Tomar la fecha del calendario si existe
+        const fechaCalendario = document.getElementById("inputFechaCalendario")?.value;
+
+        // Si no existe, usa la del formulario
+        const fechaRecargar = fechaCalendario || document.getElementById("fecha").value;
+
+        await cargarCitas(token, fechaRecargar);
 
     } catch (err) {
         console.error(err);
         alert("⚠️ No se pudo conectar con el servidor");
     }
+}
+
+// ----- Helper -----
+function formatDisplayDate(iso) {
+    if (!iso) return "";
+    const [y, m, d] = iso.split("-");
+    return `${d}/${m}/${y}`;
 }

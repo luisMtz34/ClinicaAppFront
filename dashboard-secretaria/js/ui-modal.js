@@ -27,49 +27,38 @@ export function inicializarModal() {
 export function mostrarModalCita(cita) {
   const modal = document.getElementById("modalRegistrarCita");
   const form = document.getElementById("formRegistrarCita");
-  const btnActualizar = document.getElementById("btnActualizarCita");
-  const btnCancelar = document.getElementById("cancelarRegistrarCita");
-  const btnIrPagos = document.getElementById("btnIrPagos"); // 🔹 nuevo
-  const estadoContainer = document.getElementById("estadoContainer");
+  const estadoSelect = form.elements["estado"];
+  const inputFecha = form.elements["fecha"];
+  const selectHora = form.elements["hora"];
 
   modal.style.display = "block";
 
-  // Rellenar campos
-  form.elements["idCita"].value = cita.id;
-  form.elements["fecha"].value = cita.fecha;
-  form.elements["hora"].value = cita.hora;
-  form.elements["estado"].value = cita.estado;
+  // --- Rellenar campos ---
+  form.elements["idCita"].value = cita.id || "";
+  inputFecha.value = cita.fecha || "";
+  selectHora.value = cita.hora || ""; // hora de la cita se selecciona por defecto
+  estadoSelect.value = cita.estado || "";
 
-  // Mostrar el selector de estado si existe
-  estadoContainer.style.display = "block";
+  // --- Inicialmente deshabilitado ---
+  inputFecha.disabled = true;
+  selectHora.disabled = true;
 
-  // --- Nueva lógica ---
-  if (cita.estado === "ATENDIDA" || cita.estado === "CANCELADA") {
-    // Desactivar todos los campos
-    Array.from(form.elements).forEach((el) => (el.disabled = true));
+  // --- Función para habilitar/deshabilitar según estado ---
+  const actualizarFechaHora = (estado) => {
+    if (estado === "REAGENDADA") {
+      inputFecha.disabled = false;
+      selectHora.disabled = false;
+    } else {
+      inputFecha.disabled = true;
+      selectHora.disabled = true;
+    }
+  };
 
-    // Ocultar botón de actualizar
-    btnActualizar.style.display = "none";
+  // Aplicar estado al abrir modal
+  actualizarFechaHora(estadoSelect.value);
 
-    // Cambiar texto del botón cancelar
-    btnCancelar.textContent = "Cerrar";
-    btnCancelar.disabled = false;
-
-    // 🔹 Mostrar botón de pagos
-    btnIrPagos.style.display = "inline-block";
-
-    // 🔹 Configurar evento de navegación a la pantalla de pagos
-    btnIrPagos.onclick = () => {
-      const idCita = cita.id;
-      window.location.href = `/dashboard-secretaria/pagos.html?idCita=${idCita}`;
-    };
-  } else {
-    // Si la cita no está atendida ni cancelada
-    Array.from(form.elements).forEach((el) => (el.disabled = false));
-    btnActualizar.style.display = "inline-block";
-    btnCancelar.textContent = "Cancelar";
-
-    // 🔹 Ocultar botón de pagos
-    btnIrPagos.style.display = "none";
-  }
+  // Escuchar cambios en el select de estado
+  estadoSelect.addEventListener("change", (e) => {
+    actualizarFechaHora(e.target.value);
+  });
 }

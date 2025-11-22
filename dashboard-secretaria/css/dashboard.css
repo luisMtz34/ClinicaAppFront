@@ -369,3 +369,14 @@ body {
   color: #fff;
   border-color: #007bff;
 }
+#fechaContainer,
+#horaContainer {
+  display: flex;
+  flex-direction: column; /* etiqueta arriba, input abajo */
+  gap: 4px; /* espacio entre label y input */
+}
+
+#fechaContainer label,
+#horaContainer label {
+  text-align: left; /* opcional: alinear texto del label a la izquierda */
+}
