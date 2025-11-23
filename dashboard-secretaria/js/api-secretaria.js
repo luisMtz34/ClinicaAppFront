@@ -47,8 +47,10 @@ export async function cargarCitas(token, fechaSeleccionada) {
             c.fecha === fechaFiltro && c.estado !== "CANCELADA"
         );
 
+        // Limpiar y construir tabla en blanco
         generarTablaHorarios();
 
+        // Rellenar la tabla con las citas del día (esto pone dataset.id en las celdas ocupadas)
         citasDelDia.forEach(cita => {
             const horaCita = (cita.hora || "").substring(0, 5);
             document.querySelectorAll("#tablaCitas tr").forEach(fila => {
@@ -75,13 +77,44 @@ export async function cargarCitas(token, fechaSeleccionada) {
                             hora: horaCita,
                             pago: pago
                         });
-
                     }
                 }
             });
         });
 
+        // --- BLOQUEO: solo después de haber asignado dataset a celdas ocupadas ---
+        const hoy = new Date().toISOString().split("T")[0]; // 'YYYY-MM-DD'
+        // bloqueo solo si la fecha de vista es anterior a hoy
+        // LIMPIAR CUALQUIER HORA, ESPACIOS O FORMATO RARO
+        // usar la fecha LOCAL para evitar problemas con UTC/toISOString()
+        const fechaVistaStr = (fechaFiltro || "").split("T")[0].trim();
 
+        // calcular 'hoy' en local YYYY-MM-DD (no UTC)
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const dd = String(now.getDate()).padStart(2, "0");
+        const fechaHoyStr = `${yyyy}-${mm}-${dd}`;
+
+        // comparar strings YYYY-MM-DD (funciona porque formato lexicográficamente ordena)
+        const esFechaPasada = fechaVistaStr && fechaVistaStr < fechaHoyStr;
+
+
+
+
+        document.querySelectorAll("#tablaCitas td[data-consultorio]").forEach(celda => {
+            if (esFechaPasada && !celda.dataset.id) {
+                // bloquear solo libres
+                celda.style.background = "#eeeeee";
+                celda.style.cursor = "not-allowed";
+                celda.style.pointerEvents = "none";
+            } else if (!celda.dataset.id) {
+                // habilitar si no es fecha pasada
+                celda.style.background = "";
+                celda.style.cursor = "pointer";
+                celda.style.pointerEvents = "auto";
+            }
+        });
         inicializarDelegacionClick();
     } catch (err) {
         console.error(err);
@@ -91,9 +124,9 @@ export async function cargarCitas(token, fechaSeleccionada) {
             text: "No se pudieron cargar las citas.",
             confirmButtonColor: "#d33"
         });
-
     }
 }
+
 
 export async function registrarOActualizarCita(e) {
     e.preventDefault();
@@ -191,11 +224,8 @@ export async function registrarOActualizarCita(e) {
 
                     document.getElementById("modalRegistrarCita").style.display = "none";
 
-                    // Tomar la fecha del calendario si existe
-                    const fechaCalendario = document.getElementById("inputFechaCalendario")?.value;
-
                     // Si no existe, usa la del formulario
-                    const fechaRecargar = fechaCalendario || document.getElementById("fecha").value;
+                    const fechaRecargar = document.getElementById("fecha").value;
 
                     // Actualizar encabezado si existe
                     const header = document.getElementById("fechaActual");

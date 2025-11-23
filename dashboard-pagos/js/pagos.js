@@ -70,11 +70,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await cargarFiltrosIniciales();
 
-    function actualizarTotal(pagos) {
-        const total = pagos.reduce((acc, p) => acc + (p.montoTotal || 0), 0);
-        document.getElementById("totalPagos").textContent =
-            "Total: $" + total.toFixed(2);
-    }
+function actualizarTotal(pagos) {
+    const totalPagos = pagos.reduce((acc, p) => acc + (p.montoTotal || 0), 0);
+    const totalComisiones = pagos.reduce((acc, p) => acc + (p.comisionClinica || 0), 0);
+    const totalPsicologo = totalPagos - totalComisiones;
+
+    document.getElementById("totalPagos").textContent =
+        "Total pagado: $" + totalPagos.toFixed(2);
+
+    document.getElementById("totalComisiones").textContent =
+        "Total comisiones: $" + totalComisiones.toFixed(2);
+
+    document.getElementById("totalPsicologo").textContent =
+        "Total para psicólogo: $" + totalPsicologo.toFixed(2);
+}
 
 
     // =======================
@@ -170,7 +179,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             datos.tipoPago = form.tipoPago.value;
         }
-        datos.comisionClinica = 0;
+        datos.comisionClinica = parseFloat(datos.comisionClinica || 0);
 
         const resp = await fetch("http://localhost:8082/pagos", {
             method: "POST",
@@ -226,10 +235,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <th>Psicólogo</th>
                 <th>Monto</th>
                 <th>Penalización</th>
+                <th>Comision</th>
                 <th>Fecha y Hora</th>
                 <th>Motivo</th>
                 <th>Tipo de Pago</th>
-                <th>Observaciones</th>
+                <th>Observación</th>
             </tr>
         </thead>
         <tbody>
@@ -239,6 +249,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <td>${p.nombrePsicologo || "-"}</td>
                     <td>$${p.montoTotal || "-"}</td>
                     <td>${p.penalizacion ? "$" + p.penalizacion : "-"}</td>
+                    <td>${p.comisionClinica ? "$" + p.comisionClinica : "-"}</td>
                     <td>${p.fechaCita || ""} ${p.horaCita || ""}</td>
                     <td>${p.motivo || "-"}</td>
                     <td>${formatearTexto(p.tipoPago)}</td>
@@ -440,7 +451,7 @@ function generarReportePagosPDF(data) {
     ]);
 
     doc.autoTable({
-        head: [["Paciente", "Psicólogo", "Monto", "Penalización", "Fecha", "Motivo", "Tipo", "Observaciones"]],
+        head: [["Paciente", "Psicólogo", "Monto", "Penalización", "Comision", "Fecha", "Motivo", "Tipo", "Observaciones"]],
         body: tabla,
         startY: 20
     });
