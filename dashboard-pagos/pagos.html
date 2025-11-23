@@ -145,6 +145,12 @@
     <div id="modalPago" class="modal">
         <div class="modal-contenido">
             <h2>Registrar pago</h2>
+
+            <div id="penalizacionesPendientes"
+                style="display:none; background:#ffe5e5; padding:10px; border-left:4px solid red; margin-bottom:10px;">
+            </div>
+
+
             <form id="formPago">
 
                 <div class="campo">
@@ -191,10 +197,13 @@
         </div>
     </div>
 
-    <script src="./js/pagos.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="./js/pagos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         const btnSalir = document.getElementById('btnSalir');
         btnSalir?.addEventListener('click', () => {

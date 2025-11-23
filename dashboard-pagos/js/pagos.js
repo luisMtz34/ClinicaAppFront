@@ -70,20 +70,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await cargarFiltrosIniciales();
 
-function actualizarTotal(pagos) {
-    const totalPagos = pagos.reduce((acc, p) => acc + (p.montoTotal || 0), 0);
-    const totalComisiones = pagos.reduce((acc, p) => acc + (p.comisionClinica || 0), 0);
-    const totalPsicologo = totalPagos - totalComisiones;
+    function actualizarTotal(pagos) {
+        // Filtrar solo pagos de citas atendidas (ignorar penalizaciones)
+        const pagosAtendidos = pagos.filter(p => p.tipoPago !== "PENALIZACION");
 
-    document.getElementById("totalPagos").textContent =
-        "Total pagado: $" + totalPagos.toFixed(2);
+        const totalPagos = pagosAtendidos.reduce((acc, p) => acc + (p.montoTotal || 0), 0);
+        const totalComisiones = pagosAtendidos.reduce((acc, p) => acc + (p.comisionClinica || 0), 0);
+        const totalPsicologo = totalPagos - totalComisiones;
 
-    document.getElementById("totalComisiones").textContent =
-        "Total comisiones: $" + totalComisiones.toFixed(2);
+        document.getElementById("totalPagos").textContent =
+            "Total: $" + totalPagos.toFixed(2);
 
-    document.getElementById("totalPsicologo").textContent =
-        "Total para psicólogo: $" + totalPsicologo.toFixed(2);
-}
+        document.getElementById("totalComisiones").textContent =
+            "Total comisiones: $" + totalComisiones.toFixed(2);
+
+        document.getElementById("totalPsicologo").textContent =
+            "Total para psicólogo: $" + totalPsicologo.toFixed(2);
+    }
+
 
 
     // =======================
@@ -139,6 +143,44 @@ function actualizarTotal(pagos) {
     // =======================
     if (idCita && modo !== "ver") {
         ajustarCamposSegunModo();
+
+        // =====================
+        // 🔎 Cargar datos de la cita y penalizaciones del paciente
+        // =====================
+
+        // 1. Obtener datos de la cita
+        const respCita = await fetch(`http://localhost:8082/secretaria/citas/${idCita}`, {
+            headers: { Authorization: "Bearer " + token }
+        });
+        const cita = await respCita.json();
+        console.log(cita);
+
+        // 2. Obtener ID del paciente
+        const pacienteId = cita.pacienteId; // ✅ correcto
+
+        // 3. Consultar penalizaciones pendientes
+        const respPen = await fetch(`http://localhost:8082/pagos/penalizaciones/${pacienteId}`, {
+            headers: { Authorization: "Bearer " + token }
+        });
+        const penalizaciones = await respPen.json();
+
+        // 4. Mostrar penalizaciones en el modal
+        const divPen = document.getElementById("penalizacionesPendientes");
+        divPen.innerHTML = "";
+
+        if (penalizaciones.length > 0) {
+            divPen.style.display = "block";
+            penalizaciones.forEach(p => {
+                divPen.innerHTML += `
+            <div class="pen-item" style="margin-bottom:5px;">
+                🔴 Penalización pendiente: $${p.penalizacion}
+            </div>
+        `;
+            });
+        } else {
+            divPen.style.display = "none";
+        }
+
 
         if (modo === "penalizacion") {
             form.montoTotal.value = 200;
@@ -200,11 +242,23 @@ function actualizarTotal(pagos) {
             { method: "PUT", headers: { Authorization: "Bearer " + token } }
         );
 
-        alert(
-            modo === "penalizacion"
-                ? "⚠️ Penalización registrada."
-                : "✅ Pago registrado correctamente."
-        );
+        if (modo === "penalizacion") {
+            await Swal.fire({
+                icon: 'warning',
+                title: 'Penalización registrada',
+                text: 'Se registró la penalización del paciente.',
+                confirmButtonText: 'Aceptar'
+            });
+        } else {
+            await Swal.fire({
+                icon: 'success',
+                title: 'Pago registrado',
+                text: 'El pago de la cita se registró correctamente.',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+
+
 
         await cargarPagos(true);
         modal.style.display = "none";
@@ -390,44 +444,48 @@ function actualizarTotal(pagos) {
         renderTablaPagos(window._pagos);
 
     });
-});
-// ====================================
-// 📄 MODAL DE REPORTE (NUEVO DISEÑO)
-// ====================================
-const modalFormato = document.getElementById("modalFormato");
-const btnReporte = document.getElementById("btnReportePagos"); // ← CORREGIDO
 
-const btnPdf = document.getElementById("btnPdf");
-const btnExcel = document.getElementById("btnExcel");
-const btnCerrarModal = document.getElementById("btnCerrarModal");
+    // ====================================
+    // 📄 MODAL DE REPORTE (NUEVO DISEÑO)
+    // ====================================
+    const modalFormato = document.getElementById("modalFormato");
+    const btnReporte = document.getElementById("btnReportePagos"); // ← CORREGIDO
 
-// Abrir modal
-btnReporte.addEventListener("click", () => {
-    modalFormato.classList.remove("oculto");
-});
+    const btnPdf = document.getElementById("btnPdf");
+    const btnExcel = document.getElementById("btnExcel");
+    const btnCerrarModal = document.getElementById("btnCerrarModal");
 
-// Cerrar modal
-btnCerrarModal.addEventListener("click", () => {
-    modalFormato.classList.add("oculto");
-});
+    // Abrir modal
+    btnReporte.addEventListener("click", () => {
+        modalFormato.classList.remove("oculto");
+    });
 
-// Exportar PDF
-btnPdf.addEventListener("click", () => {
-    generarReportePagosPDF(window._pagosFiltrados);
-    modalFormato.classList.add("oculto");
-});
-
-// Exportar Excel
-btnExcel.addEventListener("click", () => {
-    generarReportePagosExcel(window._pagosFiltrados);
-    modalFormato.classList.add("oculto");
-});
-// Cerrar modal haciendo clic fuera del contenido
-window.addEventListener("click", (e) => {
-    if (e.target === modalFormato) {
+    // Cerrar modal
+    btnCerrarModal.addEventListener("click", () => {
         modalFormato.classList.add("oculto");
-    }
+    });
+
+    // Exportar PDF
+    btnPdf.addEventListener("click", () => {
+        generarReportePagosPDF(window._pagosFiltrados);
+        modalFormato.classList.add("oculto");
+    });
+
+    // Exportar Excel
+    btnExcel.addEventListener("click", () => {
+        generarReportePagosExcel(window._pagosFiltrados);
+        modalFormato.classList.add("oculto");
+    });
+
+    // Cerrar modal haciendo clic fuera del contenido
+    window.addEventListener("click", (e) => {
+        if (e.target === modalFormato) {
+            modalFormato.classList.add("oculto");
+        }
+    });
 });
+
+
 function generarReportePagosPDF(data) {
     if (!data || data.length === 0) {
         alert("No hay datos para generar el reporte.");
@@ -481,40 +539,4 @@ function generarReportePagosExcel(data) {
 
     XLSX.utils.book_append_sheet(wb, ws, "Pagos");
     XLSX.writeFile(wb, "reporte_pagos.xlsx");
-}
-function obtenerPagosPagina(lista, pagina, porPagina) {
-    const inicio = (pagina - 1) * porPagina;
-    return lista.slice(inicio, inicio + porPagina);
-}
-function renderPaginacion(totalPagos) {
-    const cont = document.getElementById("paginacionPagos");
-    const totalPaginas = Math.ceil(totalPagos / pagosPorPagina);
-
-    if (totalPaginas <= 1) {
-        cont.innerHTML = "";
-        return;
-    }
-
-    let html = `
-        <button class="pag-btn" data-pag="prev">◀</button>
-        <span> Página ${paginaActual} de ${totalPaginas} </span>
-        <button class="pag-btn" data-pag="next">▶</button>
-    `;
-
-    cont.innerHTML = html;
-
-    // Eventos
-    cont.querySelector("[data-pag='prev']").onclick = () => {
-        if (paginaActual > 1) {
-            paginaActual--;
-            actualizarTablaConPaginacion();
-        }
-    };
-
-    cont.querySelector("[data-pag='next']").onclick = () => {
-        if (paginaActual < totalPaginas) {
-            paginaActual++;
-            actualizarTablaConPaginacion();
-        }
-    };
 }
