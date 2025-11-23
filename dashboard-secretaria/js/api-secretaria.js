@@ -3,7 +3,6 @@ import { generarTablaHorarios, inicializarDelegacionClick } from "./ui-tabla.js"
 import { formatearFechaISO } from "./utils-fechas.js";
 
 const BASE_URL = "http://localhost:8082/secretaria";
-console.log(localStorage.getItem("accessToken"));
 
 export async function cargarListas() {
     const token = localStorage.getItem("accessToken");
