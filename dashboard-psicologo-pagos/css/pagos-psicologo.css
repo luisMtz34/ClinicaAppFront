@@ -1,0 +1,165 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+}
+
+/* ===== HEADER ===== */
+.header {
+    background-color: #1a365d;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-volver {
+    background-color: #cc0000;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-volver:hover {
+    background-color: #a80000;
+}
+
+/* ===== FILTROS ===== */
+.filtros {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin: 20px auto;
+    padding: 15px 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    max-width: 800px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+}
+
+.filtros input[type="date"] {
+    padding: 10px 14px;
+    border: 1px solid #0e4d92;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    color: #333;
+    transition: 0.3s;
+}
+
+.filtros input[type="date"]:focus {
+    border-color: #1a365d;
+    box-shadow: 0 0 5px rgba(26,54,93,0.3);
+}
+
+.btn-secundario {
+    background-color: #6c63ff;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    border: none;
+}
+
+.btn-secundario:hover {
+    background-color: #554ee0;
+}
+
+/* ===== TABLA ===== */
+.contenedor-tabla {
+    margin: 20px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 1200px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    overflow-x: auto; /* evita que se encoja en pantallas chicas */
+}
+
+.tabla-pagos {
+    width: 100%;
+    min-width: 900px; /* fuerza que la tabla nunca se haga angosta */
+    border-collapse: collapse;
+}
+
+.tabla-pagos th {
+    background-color: #1a365d;
+    color: white;
+    padding: 12px 15px;
+    font-size: 15px;
+    text-align: left;
+}
+
+.tabla-pagos td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    font-size: 15px;
+    color: #333;
+}
+
+.tabla-pagos tr:hover {
+    background-color: #dde4f0;
+}
+
+.tabla-pagos td:nth-child(3),
+.tabla-pagos td:nth-child(4),
+.tabla-pagos td:nth-child(5) {
+    text-align: right;
+}
+
+/* ===== TOTALES ===== */
+.totales-container {
+    margin: 20px auto;
+    max-width: 1200px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.total-box {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    flex: 1;
+    min-width: 250px;
+    text-align: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+}
+
+.total-box label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.amount {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #1a365d;
+}
+.filtros label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a365d;       /* azul oscuro */
+    background: #e8eef7;  /* fondo suave */
+    padding: 8px 14px;
+    border-radius: 8px;
+}
+
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    .tabla-pagos th,
+    .tabla-pagos td {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+}

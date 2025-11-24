@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagos del Psicólogo</title>
+    <link rel="stylesheet" href="css/pagos-psicologo.css">
+</head>
+
+<body>
+    <header class="header">
+        <h2 id="nombrePsicologo">Centro de Psicoterapia Cognitivo Conductual Autlán</h2>
+        <button id="btnVolver" class="btn-volver">Volver</button>
+    </header>
+
+    <section class="filtros">
+        <label for="">Citas por fecha</label>
+        <input type="date" id="fechaFiltro">
+        <button id="btnTodosPagos" class="btn-secundario">Ver todos mis pagos</button>
+    </section>
+
+    <section class="contenedor-tabla">
+        <table class="tabla-pagos">
+            <thead>
+                <tr>
+                    <th>Paciente</th>
+                    <th>Psicólogo</th>
+                    <th>Monto</th>
+                    <th>Penalización</th>
+                    <th>Comisión</th>
+                    <th>Fecha y Hora</th>
+                    <th>Motivo</th>
+                    <th>Tipo de Pago</th>
+                    <th>Observación</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-pagos-body"></tbody>
+        </table>
+    </section>
+
+    <div class="totales-container">
+        <div class="total-box">
+            <label>Total Pagado</label>
+            <span class="amount" id="totalPagos">$0.00</span>
+        </div>
+
+        <div class="total-box">
+            <label>Total Comisión</label>
+            <span class="amount" id="totalComisiones">$0.00</span>
+        </div>
+
+        <div class="total-box">
+            <label>Total para el Psicólogo</label>
+            <span class="amount" id="totalPsicologo">$0.00</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/pagos-psicologo.js"></script>
+</body>
+</html>

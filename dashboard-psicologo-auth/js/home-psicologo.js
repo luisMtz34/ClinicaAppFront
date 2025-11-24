@@ -168,23 +168,23 @@ function mostrarCitas(citas) {
         const hora = cita.hora ? cita.hora.substring(0, 5) : "";
 
         card.innerHTML = `
-            <h3>👤 ${escapeHtml(cita.pacienteNombre || "-")}</h3>
+    <h3>👤 ${escapeHtml(cita.pacienteNombre || "-")}</h3>
 
-            <div class="card-info">
-                <p><strong>📅 Fecha:</strong> ${escapeHtml(fecha)}</p>
-                <p><strong>⏰ Hora:</strong> ${escapeHtml(hora)}</p>
-                <p><strong>📂 Tipo:</strong> ${cita.tipo ? cita.tipo.replace(/_/g, " ").toLowerCase() : ""
-            }</p>
+    <div class="card-info">
+        <p><strong>📅 Fecha:</strong> ${escapeHtml(fecha)}</p>
+        <p><strong>⏰ Hora:</strong> ${escapeHtml(hora)}</p>
+        <p><strong>📂 Tipo:</strong> ${cita.tipo ? cita.tipo.replace(/_/g, " ").toLowerCase() : ""}</p>
 
-            <span class="tag">${cita.estado ? cita.estado.replace(/_/g, " "): ""
-            }</span>
+        <span class="tag">${cita.estado ? cita.estado.replace(/_/g, " ") : ""}</span>
+    </div>
 
-            </div>
+    ${cita.estado === "ATENDIDA" ? `
+        <button class="btn-pagos" onclick="verPagos(${cita.idCitas || cita.id || 0})">
+            Ver Pagos
+        </button>
+    ` : ``}
+`;
 
-            <button class="btn-pagos" onclick="verPagos(${cita.idCitas || cita.id || 0})">
-                Ver Pagos
-            </button>
-        `;
 
         contenedor.appendChild(card);
     });
@@ -201,7 +201,8 @@ function escapeHtml(str) {
         .replace(/'/g, "&#039;");
 }
 
-function verPagos(id) {
-    if (!id) return;
-    window.location.href = `pagos-cita.html?id=${id}`;
+function verPagos(idCita) {
+    if (!idCita) return;
+    window.location.href = `../dashboard-psicologo-pagos/pagos-psicologo.html?id=${idCita}`;
 }
+

@@ -220,3 +220,17 @@ body {
 .btnBuscar:hover {
     background: #09386a;
 }
+.btnTodas {
+    padding: 10px 18px;
+    background: #6c63ff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.btnTodas:hover {
+    background: #554ee0;
+}
