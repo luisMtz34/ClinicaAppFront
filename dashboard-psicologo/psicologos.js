@@ -15,15 +15,54 @@ document.getElementById("btnSalir").addEventListener("click", () => {
 });
 
 // Registro nuevo psicólogo
+// Registro nuevo psicólogo
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const data = {
-    nombre: document.getElementById("nombre").value,
-    email: document.getElementById("email").value,
-    password: document.getElementById("password").value,
-    telefono: document.getElementById("telefono").value,
-  };
+  const nombre = document.getElementById("nombre").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+
+  // EXPRESIONES REGULARES
+  const regexNombre = /^[a-zA-ZÁÉÍÓÚáéíóúñÑ ]{3,}$/;
+  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const regexTelefono = /^[0-9]{10}$/;
+
+  // VALIDACIONES
+  if (!regexNombre.test(nombre)) {
+    return Swal.fire({
+      icon: "warning",
+      title: "Nombre inválido",
+      text: "El nombre debe tener al menos 3 letras y solo contener letras y espacios."
+    });
+  }
+
+  if (!regexEmail.test(email)) {
+    return Swal.fire({
+      icon: "warning",
+      title: "Correo inválido",
+      text: "Ingresa un correo electrónico válido."
+    });
+  }
+
+  if (password.length < 6) {
+    return Swal.fire({
+      icon: "warning",
+      title: "Contraseña inválida",
+      text: "La contraseña debe tener al menos 6 caracteres."
+    });
+  }
+
+  if (!regexTelefono.test(telefono)) {
+    return Swal.fire({
+      icon: "warning",
+      title: "Teléfono inválido",
+      text: "El teléfono debe contener exactamente 10 dígitos."
+    });
+  }
+
+  const data = { nombre, email, password, telefono };
 
   try {
     const response = await fetch(`${API_URL}/registrar`, {
@@ -65,18 +104,56 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
+
 // Manejo del formulario de edición (PUT)
 formEditar.addEventListener("submit", async e => {
   e.preventDefault();
 
   const id = document.getElementById("editId").value;
 
-  const psicologoActualizado = {
-    nombre: document.getElementById("editNombre").value,
-    email: document.getElementById("editEmail").value,
-    telefono: document.getElementById("editTelefono").value
-  };
+  const nombre = document.getElementById("editNombre").value.trim();
+  const email = document.getElementById("editEmail").value.trim();
+  const telefono = document.getElementById("editTelefono").value.trim();
 
+  // ===== VALIDACIONES =====
+
+  // Nombre: mínimo 3 letras, solo letras y espacios
+  const regexNombre = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{3,}$/;
+
+  // Email
+  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Teléfono: 10 dígitos MX
+  const regexTelefono = /^[0-9]{10}$/;
+
+  if (!regexNombre.test(nombre)) {
+    return Swal.fire({
+      icon: "warning",
+      title: "Nombre inválido",
+      text: "El nombre debe tener al menos 3 letras y solo contener letras y espacios."
+    });
+  }
+
+  if (!regexEmail.test(email)) {
+    return Swal.fire({
+      icon: "warning",
+      title: "Correo inválido",
+      text: "Debes ingresar un correo electrónico válido."
+    });
+  }
+
+  if (!regexTelefono.test(telefono)) {
+    return Swal.fire({
+      icon: "warning",
+      title: "Teléfono inválido",
+      text: "El teléfono debe contener exactamente 10 dígitos."
+    });
+  }
+
+  // Datos validados
+  const psicologoActualizado = { nombre, email, telefono };
+
+  // ===== PETICIÓN AL BACKEND =====
   try {
     const res = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
@@ -101,6 +178,7 @@ formEditar.addEventListener("submit", async e => {
 
     cerrarModal();
     obtenerPsicologos();
+    
   } catch (err) {
     console.error(err);
 
@@ -111,6 +189,7 @@ formEditar.addEventListener("submit", async e => {
     });
   }
 });
+
 
 // Cerrar modal al hacer click en "Cancelar"
 btnCerrarModal.addEventListener("click", () => cerrarModal());

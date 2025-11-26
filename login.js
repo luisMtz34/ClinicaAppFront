@@ -43,7 +43,9 @@ loginForm.addEventListener('submit', async (e) => {
       window.location.href = "/dashboard-secretaria/home-secretaria.html";
     } else if (rol === "PSICOLOGO") {
       window.location.href = "/dashboard-psicologo-auth/home-psicologo.html";
-    } else {
+    } else if (rol === "ADMIN") {
+      window.location.href = "/dashboard-admin/admin.html"; 
+    }else {
       alert("Rol no reconocido ❌");
     }
 
