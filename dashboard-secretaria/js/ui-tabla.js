@@ -47,6 +47,7 @@ export function inicializarDelegacionClick() {
   nuevo.addEventListener("click", async (e) => {
     const celda = e.target.closest("td[data-consultorio]");
     if (!celda) return;
+    if (window.location.search.includes("modo=ver")) return;
 
     const idCita = celda.dataset.id || "";
     const consultorio = celda.dataset.consultorio;
@@ -132,7 +133,7 @@ export function inicializarDelegacionClick() {
 
           try {
             const token = localStorage.getItem("accessToken");
-            const resp = await fetch(`${CONFIG.API_BASE_URL}/pagos/cita/${idCita}`, {
+            const resp = await fetch(`https://clinicaappback.onrender.com/pagos/cita/${idCita}`, {
               headers: { Authorization: "Bearer " + token },
             });
 
