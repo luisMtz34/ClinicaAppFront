@@ -132,7 +132,7 @@ export function inicializarDelegacionClick() {
 
           try {
             const token = localStorage.getItem("accessToken");
-            const resp = await fetch(`https://clinicaappback.onrender.com/pagos/cita/${idCita}`, {
+            const resp = await fetch(`${CONFIG.API_BASE_URL}/pagos/cita/${idCita}`, {
               headers: { Authorization: "Bearer " + token },
             });
 

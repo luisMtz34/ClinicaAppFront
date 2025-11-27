@@ -1,6 +1,6 @@
 // pagos-psicologo.js (archivo completo corregido)
 
-const API_PAGOS = "http://localhost:8082/psicologo/pagos";
+const API_PAGOS = `${CONFIG.API_BASE_URL}/psicologo/pagos`;
 window._pagos = [];
 window._pagosFiltrados = [];
 let paginaActual = 1;

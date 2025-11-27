@@ -2,7 +2,7 @@
 import { generarTablaHorarios, inicializarDelegacionClick } from "./ui-tabla.js";
 import { formatearFechaISO } from "./utils-fechas.js";
 
-const BASE_URL = "https://clinicaappback.onrender.com/secretaria";
+const BASE_URL = `${CONFIG.API_BASE_URL}/secretaria`;
 
 export async function cargarListas() {
     const token = localStorage.getItem("accessToken");

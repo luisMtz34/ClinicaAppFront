@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8082/secretaria/pacientes";
+const API_URL = `${CONFIG.API_BASE_URL}/secretaria/pacientes`;
 let clavePacienteEditando = null;
 
 document.addEventListener("DOMContentLoaded", async () => {

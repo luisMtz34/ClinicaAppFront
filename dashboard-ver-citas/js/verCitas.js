@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function cargarPsicologos(token) {
   const select = document.getElementById("filtroPsicologo");
 
-  const res = await fetch("http://localhost:8082/secretaria/psicologos", {
+  const res = await fetch(`${CONFIG.API_BASE_URL}/secretaria/psicologos`, {
     method: "GET",
     headers: {
       "Authorization": "Bearer " + token,
@@ -115,7 +115,7 @@ async function cargarPsicologos(token) {
 async function cargarPacientes(token) {
   const select = document.getElementById("filtroPaciente");
 
-  const res = await fetch("http://localhost:8082/secretaria/pacientes", {
+  const res = await fetch(`${CONFIG.API_BASE_URL}/secretaria/pacientes`, {
     method: "GET",
     headers: {
       "Authorization": "Bearer " + token,
@@ -138,7 +138,7 @@ async function cargarPacientes(token) {
    📌 2. Obtener citas (con token)
 =========================== */
 async function fetchCitas(token) {
-  const response = await fetch("http://localhost:8082/secretaria/citas", {
+  const response = await fetch(`${CONFIG.API_BASE_URL}/secretaria/citas`, {
     method: "GET",
     headers: {
       "Authorization": "Bearer " + token,
