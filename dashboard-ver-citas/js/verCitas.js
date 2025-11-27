@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const modal = document.getElementById("modalFormato");
   const btnReporteB = document.getElementById("btnReporte");
   const btnCerrarModal = document.getElementById("btnCerrarModal");
+  
   btnReporteB.addEventListener("click", () => modal.classList.remove("oculto"));
   btnCerrarModal.addEventListener("click", () => modal.classList.add("oculto"));
   // BOTONES DEL MODAL ✔️

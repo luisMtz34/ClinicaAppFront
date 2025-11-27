@@ -351,3 +351,122 @@ h2 {
   font-weight: bold;
   color: #44749d;
 }
+/* ============================
+   🟦 RESPONSIVE DESIGN
+   ============================ */
+
+/* Pantallas medianas (tablets) */
+@media (max-width: 992px) {
+  .navbar {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .navbar ul {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .content {
+    padding: 1.2rem;
+  }
+
+  .filtros-container {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    padding: 12px;
+  }
+
+  .table-container {
+    padding: 0.5rem;
+  }
+}
+
+/* Pantallas pequeñas (teléfonos) */
+@media (max-width: 768px) {
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  /* Navbar móvil */
+  .navbar {
+    padding: 1rem;
+  }
+
+  .navbar h1 {
+    font-size: 1.2rem;
+  }
+
+  .navbar ul {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Filtros */
+  .filtros-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .filtro {
+    width: 100%;
+  }
+
+  /* Botones: Filtrar / Reporte */
+  .filtros-botones {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .filtros-botones button {
+    width: 100%;
+  }
+
+  /* Tabla */
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .styled-table th,
+  .styled-table td {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .styled-table thead tr {
+    font-size: 0.9rem;
+  }
+
+  /* Paginación */
+  .paginacion {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .paginacion button {
+    width: 100%;
+  }
+}
+
+/* Extra pequeño (< 480px) */
+@media (max-width: 480px) {
+  .navbar h1 {
+    font-size: 1rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  .modal-contenido {
+    width: 85%;
+  }
+
+  .styled-table td,
+  .styled-table th {
+    padding: 8px;
+    font-size: 0.78rem;
+  }
+}

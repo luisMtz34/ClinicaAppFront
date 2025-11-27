@@ -380,3 +380,214 @@ body {
 #horaContainer label {
   text-align: left; /* opcional: alinear texto del label a la izquierda */
 }
+/* ===== ESTILOS RESPONSIVE PARA MÓVILES Y TABLETS ===== */
+@media (max-width: 1024px) {
+  /* Navbar: apilar y centrar */
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px 20px;
+    gap: 10px;
+  }
+
+  .navbar h1 {
+    font-size: 1.5rem;
+  }
+
+  .navbar ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .navbar li {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  /* Botón salir */
+  #btnSalir {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Contenido principal */
+  .content {
+    padding: 15px;
+  }
+
+  /* Encabezado sección */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Tabla */
+  .table-container {
+    width: 100%;
+    padding: 15px;
+    overflow-x: auto; /* scroll horizontal si la tabla es muy ancha */
+  }
+
+  .styled-table th, .styled-table td {
+    padding: 6px;
+    font-size: 0.85rem;
+  }
+
+  .styled-table th {
+    font-size: 0.9rem;
+  }
+
+  /* Navegación de fechas */
+  .fecha-nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-fecha {
+    width: 100%;
+    min-width: unset;
+    text-align: center;
+  }
+
+  #btnHoy {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /* Modal */
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+
+  #formRegistrarCita input,
+  #formRegistrarCita select,
+  #formRegistrarCita textarea {
+    font-size: 0.9rem;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-guardar, .btn-cancelar, #btnIrPagos {
+    width: 100%;
+  }
+
+  /* Ajuste de la tabla de citas */
+  .styled-table td[data-consultorio] {
+    font-size: 0.8rem;
+    padding: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar h1 {
+    font-size: 1.2rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .btn-primary {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  .styled-table th, .styled-table td {
+    font-size: 0.75rem;
+    padding: 4px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 12px;
+  }
+
+  #formRegistrarCita label {
+    font-size: 0.85rem;
+  }
+
+  #inputFechaCalendario {
+    font-size: 0.85rem;
+    padding: 4px 6px;
+  }
+
+  .btn-fecha {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+
+  #fechaActual {
+    font-size: 1rem;
+  }
+  /* ===== Ajustes específicos para botones y fecha ===== */
+@media (max-width: 768px) {
+  /* Encabezado sección */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .section-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .btn-primary {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+
+  /* Contenedor de navegación de fechas */
+  .fecha-nav {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+    margin-bottom: 10px;
+  }
+
+  .btn-fecha {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    min-width: 60px;
+  }
+
+  #fechaActual {
+    font-size: 1rem;
+    margin: 0 5px;
+  }
+
+  /* Contenedor de calendario y botón Hoy */
+  .fecha-agendar {
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  #inputFechaCalendario {
+    font-size: 0.85rem;
+    padding: 4px 6px;
+  }
+
+  #btnHoy {
+    font-size: 0.85rem;
+    padding: 4px 8px;
+  }
+}
+
+}
