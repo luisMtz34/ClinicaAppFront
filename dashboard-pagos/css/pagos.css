@@ -522,6 +522,10 @@ textarea {
 .oculto {
     display: none !important;
 }
+#modalPago {
+    display: none; /* oculto por defecto */
+}
+
 
 .modal {
     position: fixed;
