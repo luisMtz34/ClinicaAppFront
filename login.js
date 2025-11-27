@@ -22,11 +22,12 @@ loginForm.addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
 
   try {
-    const response = await fetch("http://localhost:8082/auth/acceder", {
+    const response = await fetch(`${CONFIG.API_BASE_URL}/auth/acceder`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }) 
+      body: JSON.stringify({ email, password })
     });
+
 
     if (!response.ok) throw new Error("Error en login");
 
@@ -44,8 +45,8 @@ loginForm.addEventListener('submit', async (e) => {
     } else if (rol === "PSICOLOGO") {
       window.location.href = "/dashboard-psicologo-auth/home-psicologo.html";
     } else if (rol === "ADMIN") {
-      window.location.href = "/dashboard-admin/admin.html"; 
-    }else {
+      window.location.href = "/dashboard-admin/admin.html";
+    } else {
       alert("Rol no reconocido ❌");
     }
 

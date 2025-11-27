@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8082/admin/registrar-secretaria", {
+      const response = await fetch(`${CONFIG.API_BASE_URL}/admin/registrar-secretaria`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

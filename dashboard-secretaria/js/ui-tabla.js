@@ -132,9 +132,10 @@ export function inicializarDelegacionClick() {
 
           try {
             const token = localStorage.getItem("accessToken");
-            const resp = await fetch(`http://localhost:8082/pagos/cita/${idCita}`, {
+            const resp = await fetch(`https://clinicaappback.onrender.com/pagos/cita/${idCita}`, {
               headers: { Authorization: "Bearer " + token },
             });
+
             const pagos = await resp.json();
             const yaTienePenalizacion = pagos.some(p => p.tipoPago === "PENALIZACION");
 

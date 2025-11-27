@@ -1,4 +1,4 @@
-const API_CITAS = "http://localhost:8082/psicologo/citas";
+const API_CITAS =  `${CONFIG.API_BASE_URL}/psicologo/citas`;
 
 document.addEventListener("DOMContentLoaded", () => {
     // obtener elementos tras carga DOM

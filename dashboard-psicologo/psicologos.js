@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8082/secretaria/psicologos";
+const API_URL = `${CONFIG.API_BASE_URL}/secretaria/psicologos`;
 
 // referencias globales del DOM
 const modalEditar = document.getElementById("modalEditar");

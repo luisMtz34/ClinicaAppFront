@@ -54,8 +54,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     // =======================
     async function cargarFiltrosIniciales() {
         const [psicologosResp, pacientesResp] = await Promise.all([
-            fetch("http://localhost:8082/secretaria/psicologos", { headers: { Authorization: "Bearer " + token } }),
-            fetch("http://localhost:8082/secretaria/pacientes", { headers: { Authorization: "Bearer " + token } })
+            fetch(`${CONFIG.API_BASE_URL}/secretaria/psicologos`, {
+                headers: { Authorization: "Bearer " + token }
+            }),
+            fetch(`${CONFIG.API_BASE_URL}/secretaria/pacientes`, {
+                headers: { Authorization: "Bearer " + token }
+            })
         ]);
 
         const psicologos = await psicologosResp.json();
@@ -149,9 +153,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         // =====================
 
         // 1. Obtener datos de la cita
-        const respCita = await fetch(`http://localhost:8082/secretaria/citas/${idCita}`, {
+        const respCita = await fetch(`${CONFIG.API_BASE_URL}/secretaria/citas/${idCita}`, {
             headers: { Authorization: "Bearer " + token }
         });
+
         const cita = await respCita.json();
         console.log(cita);
 
@@ -159,9 +164,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const pacienteId = cita.pacienteId; // ✅ correcto
 
         // 3. Consultar penalizaciones pendientes
-        const respPen = await fetch(`http://localhost:8082/pagos/penalizaciones/${pacienteId}`, {
+        const respPen = await fetch(`${CONFIG.API_BASE_URL}/pagos/penalizaciones/${pacienteId}`, {
             headers: { Authorization: "Bearer " + token }
         });
+
         const penalizaciones = await respPen.json();
 
         // 4. Mostrar penalizaciones en el modal
@@ -223,7 +229,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         datos.comisionClinica = parseFloat(datos.comisionClinica || 0);
 
-        const resp = await fetch("http://localhost:8082/pagos", {
+        const resp = await fetch(`${CONFIG.API_BASE_URL}/pagos`, {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
             body: JSON.stringify(datos)
@@ -238,7 +244,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const nuevoEstado = (modo === "penalizacion") ? "NO_ASISTIO" : "ATENDIDA";
 
         await fetch(
-            `http://localhost:8082/secretaria/citas/${idCita}/estado?estado=${nuevoEstado}`,
+            `${CONFIG.API_BASE_URL}/secretaria/citas/${idCita}/estado?estado=${nuevoEstado}`,
             { method: "PUT", headers: { Authorization: "Bearer " + token } }
         );
 
@@ -368,8 +374,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     // =======================
     async function cargarPagos(verTodos = false) {
         const url = verTodos
-            ? "http://localhost:8082/pagos"
-            : `http://localhost:8082/pagos/cita/${idCita}`;
+            ? `${CONFIG.API_BASE_URL}/pagos`
+            : `${CONFIG.API_BASE_URL}/pagos/cita/${idCita}`;
+
 
         const resp = await fetch(url, { headers: { Authorization: "Bearer " + token } });
         const datos = await resp.json();
