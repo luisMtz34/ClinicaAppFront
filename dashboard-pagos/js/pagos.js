@@ -146,48 +146,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 📌 Mostrar Modal según modo
     // =======================
     if (idCita && modo !== "ver") {
+        // Solo para registro o penalización
         ajustarCamposSegunModo();
-
-        // =====================
-        // 🔎 Cargar datos de la cita y penalizaciones del paciente
-        // =====================
 
         // 1. Obtener datos de la cita
         const respCita = await fetch(`${CONFIG.API_BASE_URL}/secretaria/citas/${idCita}`, {
             headers: { Authorization: "Bearer " + token }
         });
-
         const cita = await respCita.json();
-        console.log(cita);
 
         // 2. Obtener ID del paciente
-        const pacienteId = cita.pacienteId; // ✅ correcto
+        const pacienteId = cita.pacienteId;
 
         // 3. Consultar penalizaciones pendientes
         const respPen = await fetch(`${CONFIG.API_BASE_URL}/pagos/penalizaciones/${pacienteId}`, {
             headers: { Authorization: "Bearer " + token }
         });
-
         const penalizaciones = await respPen.json();
 
         // 4. Mostrar penalizaciones en el modal
         const divPen = document.getElementById("penalizacionesPendientes");
         divPen.innerHTML = "";
-
         if (penalizaciones.length > 0) {
             divPen.style.display = "block";
             penalizaciones.forEach(p => {
                 divPen.innerHTML += `
-            <div class="pen-item" style="margin-bottom:5px;">
-                🔴 Penalización pendiente: $${p.penalizacion}
-            </div>
-        `;
+                <div class="pen-item" style="margin-bottom:5px;">
+                    🔴 Penalización pendiente: $${p.penalizacion}
+                </div>
+            `;
             });
         } else {
             divPen.style.display = "none";
         }
 
-
+        // Ajustar valores según modo
         if (modo === "penalizacion") {
             form.montoTotal.value = 200;
             form.motivo.value = "Penalización por inasistencia";
@@ -197,11 +190,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             form.motivo.value = "Cita atendida";
         }
 
-        modal.style.display = "flex";
+        modal.style.display = "flex"; // Abrir modal solo si no es modo "ver"
+
     } else {
+        // Solo para ver pagos: no abrir modal
         modal.style.display = "none";
-        form.style.display = modo === "ver" ? "none" : "block";
+        form.style.display = "none"; // ocultamos el formulario
     }
+
 
     // =======================
     // ❌ Botón cancelar modal
