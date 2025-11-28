@@ -37,122 +37,81 @@ document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const idCita = urlParams.get("idCita");
     const modo = (urlParams.get("modo") || "registro").toLowerCase();
-    if (idCita && modo === "ver") {
-        try {
-            const resp = await fetch(`${CONFIG.API_BASE_URL}/pagos/cita/${idCita}`, {
-                headers: { Authorization: "Bearer " + token }
-            });
-
-            const pago = await resp.json();
-
-            window._pagos = pago;             // Solo el pago de esta cita
-            window._pagosFiltrados = pago;    // Para paginación
-            paginaActual = 1;
-
-            renderTablaPagos(window._pagosFiltrados);
-
-            // Ocultar filtros porque solo es 1 pago
-            document.querySelector(".filtros-container").style.display = "none";
-
-            return; // IMPORTANTE: evita cargar todos los pagos después
-        } catch (e) {
-            console.error("Error cargando pago por cita", e);
-        }
-    }
 
     // =======================
-    // 📝 Funciones auxiliares
+    // 📝 Funciones auxiliares (declaradas como funciones para evitar hoisting issues)
     // =======================
-    const formatearTexto = (texto) => {
+    function formatearTexto(texto) {
         if (!texto) return "-";
         return texto.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-    };
+    }
 
-    const normalizarHora = (h) => h ? h.substring(0, 5) : "";
+    function normalizarHora(h) {
+        return h ? h.substring(0, 5) : "";
+    }
 
-    const obtenerPagosPagina = (pagos, pagina, porPagina) => {
+    function obtenerPagosPagina(pagos, pagina, porPagina = pagosPorPagina) {
         const inicio = (pagina - 1) * porPagina;
         return pagos.slice(inicio, inicio + porPagina);
-    };
+    }
 
-    const actualizarTotal = (pagos) => {
+    function actualizarTotal(pagos) {
         const pagosAtendidos = pagos.filter(p => p.tipoPago !== "PENALIZACION");
         const totalPagos = pagosAtendidos.reduce((acc, p) => acc + (p.montoTotal || 0), 0);
         const totalComisiones = pagosAtendidos.reduce((acc, p) => acc + (p.comisionClinica || 0), 0);
         const totalPsicologo = totalPagos - totalComisiones;
 
-        document.getElementById("totalPagos").textContent = "Total: $" + totalPagos.toFixed(2);
-        document.getElementById("totalComisiones").textContent = "Total comisiones: $" + totalComisiones.toFixed(2);
-        document.getElementById("totalPsicologo").textContent = "Total para psicólogo: $" + totalPsicologo.toFixed(2);
-    };
+        const elTotal = document.getElementById("totalPagos");
+        const elComisiones = document.getElementById("totalComisiones");
+        const elPsicologo = document.getElementById("totalPsicologo");
 
-    // =======================
-    // 🔄 Cargar filtros iniciales
-    // =======================
-    const cargarFiltrosIniciales = async () => {
-        const [psicologosResp, pacientesResp] = await Promise.all([
-            fetch(`${CONFIG.API_BASE_URL}/secretaria/psicologos`, { headers: { Authorization: "Bearer " + token } }),
-            fetch(`${CONFIG.API_BASE_URL}/secretaria/pacientes`, { headers: { Authorization: "Bearer " + token } })
-        ]);
+        if (elTotal) elTotal.textContent = "Total: $" + totalPagos.toFixed(2);
+        if (elComisiones) elComisiones.textContent = "Total comisiones: $" + totalComisiones.toFixed(2);
+        if (elPsicologo) elPsicologo.textContent = "Total para psicólogo: $" + totalPsicologo.toFixed(2);
+    }
 
-        const psicologos = await psicologosResp.json();
-        const pacientes = await pacientesResp.json();
+    function renderPaginacion(totalPagos) {
+        const contenedor = document.getElementById("paginacionPagos");
+        if (!contenedor) return;
+        contenedor.innerHTML = "";
 
-        filtroPsicologo.innerHTML = `<option value="">Todos</option>` +
-            psicologos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join("");
+        const totalPaginas = Math.ceil(totalPagos / pagosPorPagina);
+        if (totalPaginas <= 1) return;
 
-        filtroPaciente.innerHTML = `<option value="">Todos</option>` +
-            pacientes.map(p => `<option value="${p.clave}">${p.nombre}</option>`).join("");
-    };
+        // Botón anterior
+        const btnPrev = document.createElement("button");
+        btnPrev.textContent = "Anterior";
+        btnPrev.disabled = paginaActual === 1;
+        btnPrev.addEventListener("click", () => {
+            if (paginaActual > 1) paginaActual--;
+            renderTablaPagos(window._pagosFiltrados);
+        });
+        contenedor.appendChild(btnPrev);
 
-    await cargarFiltrosIniciales();
-
-    // =======================
-    // 🎨 Ajuste de Campos según modo
-    // =======================
-    const ajustarCamposSegunModo = () => {
-        const campoComision = form.querySelector("[name='comisionClinica']").closest(".campo");
-        const campoTipoPago = form.querySelector("[name='tipoPago']").closest(".campo");
-        const campoPenalizacion = form.querySelector("[name='penalizacion']").closest(".campo");
-        const campoMonto = form.querySelector("[name='montoTotal']").closest(".campo");
-        const campoMotivo = form.querySelector("[name='motivo']").closest(".campo");
-        const campoObs = form.querySelector("[name='observaciones']").closest(".campo");
-
-        const tipoPagoSelect = form.querySelector("[name='tipoPago']");
-        const comisionInput = form.querySelector("[name='comisionClinica']");
-
-        if (modo === "penalizacion") {
-            campoMonto.classList.remove("oculto");
-            campoMotivo.classList.remove("oculto");
-            campoObs.classList.remove("oculto");
-            campoComision.classList.add("oculto");
-            campoTipoPago.classList.add("oculto");
-            campoPenalizacion.classList.remove("oculto");
-            tipoPagoSelect.removeAttribute("required");
-            comisionInput.removeAttribute("required");
-            tipoPagoSelect.value = "PENALIZACION";
-            comisionInput.value = 0;
-        } else if (modo === "atendida") {
-            campoMonto.classList.remove("oculto");
-            campoComision.classList.remove("oculto");
-            campoTipoPago.classList.remove("oculto");
-            campoMotivo.classList.remove("oculto");
-            campoObs.classList.remove("oculto");
-            campoPenalizacion.classList.add("oculto");
-            tipoPagoSelect.setAttribute("required", true);
-            comisionInput.setAttribute("required", true);
-            tipoPagoSelect.value = "";
-        } else {
-            campoComision.classList.remove("oculto");
-            campoTipoPago.classList.remove("oculto");
-            campoPenalizacion.classList.add("oculto");
+        // Números
+        for (let i = 1; i <= totalPaginas; i++) {
+            const btn = document.createElement("button");
+            btn.textContent = i;
+            if (i === paginaActual) btn.classList.add("active-page");
+            btn.addEventListener("click", () => {
+                paginaActual = i;
+                renderTablaPagos(window._pagosFiltrados);
+            });
+            contenedor.appendChild(btn);
         }
-    };
 
-    // =======================
-    // 📊 Renderizar tabla y paginación
-    // =======================
-    const renderTablaPagos = (pagos) => {
+        // Botón siguiente
+        const btnNext = document.createElement("button");
+        btnNext.textContent = "Siguiente";
+        btnNext.disabled = paginaActual === totalPaginas;
+        btnNext.addEventListener("click", () => {
+            if (paginaActual < totalPaginas) paginaActual++;
+            renderTablaPagos(window._pagosFiltrados);
+        });
+        contenedor.appendChild(btnNext);
+    }
+
+    function renderTablaPagos(pagos) {
         listaPagos.innerHTML = "";
         if (!pagos || pagos.length === 0) {
             listaPagos.innerHTML = "<p>No se encontraron resultados.</p>";
@@ -184,7 +143,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <tr>
                         <td>${p.nombrePaciente || "-"}</td>
                         <td>${p.nombrePsicologo || "-"}</td>
-                        <td>$${p.montoTotal || "-"}</td>
+                        <td>${p.montoTotal != null ? "$" + p.montoTotal : "-"}</td>
                         <td>${p.penalizacion ? "$" + p.penalizacion : "-"}</td>
                         <td>${p.comisionClinica ? "$" + p.comisionClinica : "-"}</td>
                         <td>${p.fechaCita || ""} ${p.horaCita || ""}</td>
@@ -198,78 +157,76 @@ document.addEventListener("DOMContentLoaded", async () => {
         listaPagos.appendChild(tabla);
         actualizarTotal(pagos);
         renderPaginacion(pagos.length);
-    };
+    }
 
-    const renderPaginacion = (totalPagos) => {
-        const contenedor = document.getElementById("paginacionPagos");
-        contenedor.innerHTML = "";
+    // =======================
+    // 🔄 Cargar filtros iniciales
+    // =======================
+    async function cargarFiltrosIniciales() {
+        try {
+            const [psicologosResp, pacientesResp] = await Promise.all([
+                fetch(`${CONFIG.API_BASE_URL}/secretaria/psicologos`, { headers: { Authorization: "Bearer " + token } }),
+                fetch(`${CONFIG.API_BASE_URL}/secretaria/pacientes`, { headers: { Authorization: "Bearer " + token } })
+            ]);
 
-        const totalPaginas = Math.ceil(totalPagos / pagosPorPagina);
-        if (totalPaginas <= 1) return;
+            const psicologos = await psicologosResp.json();
+            const pacientes = await pacientesResp.json();
 
-        // Botón anterior
-        const btnPrev = document.createElement("button");
-        btnPrev.textContent = "Anterior";
-        btnPrev.disabled = paginaActual === 1;
-        btnPrev.addEventListener("click", () => {
-            paginaActual--;
-            renderTablaPagos(window._pagosFiltrados);
-        });
-        contenedor.appendChild(btnPrev);
+            if (filtroPsicologo) {
+                filtroPsicologo.innerHTML = `<option value="">Todos</option>` +
+                    psicologos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join("");
+            }
 
-        // Números
-        for (let i = 1; i <= totalPaginas; i++) {
-            const btn = document.createElement("button");
-            btn.textContent = i;
-            if (i === paginaActual) btn.classList.add("active-page");
-            btn.addEventListener("click", () => {
-                paginaActual = i;
-                renderTablaPagos(window._pagosFiltrados);
-            });
-            contenedor.appendChild(btn);
+            if (filtroPaciente) {
+                filtroPaciente.innerHTML = `<option value="">Todos</option>` +
+                    pacientes.map(p => `<option value="${p.clave}">${p.nombre}</option>`).join("");
+            }
+        } catch (err) {
+            console.error("Error cargando filtros iniciales:", err);
         }
-
-        // Botón siguiente
-        const btnNext = document.createElement("button");
-        btnNext.textContent = "Siguiente";
-        btnNext.disabled = paginaActual === totalPaginas;
-        btnNext.addEventListener("click", () => {
-            paginaActual++;
-            renderTablaPagos(window._pagosFiltrados);
-        });
-        contenedor.appendChild(btnNext);
-    };
+    }
 
     // =======================
     // 🔄 Cargar pagos
     // =======================
-    const cargarPagos = async (verTodos = false) => {
-        const url = verTodos
-            ? `${CONFIG.API_BASE_URL}/pagos`
-            : `${CONFIG.API_BASE_URL}/pagos/cita/${idCita}`;
+    async function cargarPagos(verTodos = false) {
+        try {
+            // Si el llamador pide verTodos o no hay idCita, usar el endpoint /pagos
+            const url = verTodos || !idCita
+                ? `${CONFIG.API_BASE_URL}/pagos`
+                : `${CONFIG.API_BASE_URL}/pagos/cita/${idCita}`;
 
-        const resp = await fetch(url, { headers: { Authorization: "Bearer " + token } });
-        const datos = await resp.json();
+            const resp = await fetch(url, { headers: { Authorization: "Bearer " + token } });
+            const datos = await resp.json();
 
-        // Siempre actualizar filtrados
-        window._pagos = datos;
-        window._pagosFiltrados = [...datos];
-        paginaActual = 1;
+            // Asegurarnos de trabajar con arrays
+            const datosArray = Array.isArray(datos) ? datos : (datos ? [datos] : []);
 
-        renderTablaPagos(window._pagosFiltrados);
-    };
+            // Siempre actualizar filtrados
+            window._pagos = datosArray;
+            window._pagosFiltrados = [...datosArray];
+            paginaActual = 1;
+
+            renderTablaPagos(window._pagosFiltrados);
+        } catch (err) {
+            console.error("Error cargando pagos:", err);
+            listaPagos.innerHTML = "<p>Error cargando pagos. Revisa la consola.</p>";
+            actualizarTotal([]);
+            renderPaginacion(0);
+        }
+    }
 
     // =======================
     // 🔎 Aplicar filtros
     // =======================
-    const aplicarFiltrosPagos = () => {
-        const paciente = filtroPaciente.value;
-        const psicologo = filtroPsicologo.value;
-        const fecha = document.getElementById("filtroFechaPago").value;
-        const hora = document.getElementById("filtroHoraPago").value;
-        const tipoPago = document.getElementById("filtroTipoPago").value;
-        const tienePenalizacion = document.getElementById("filtroPenalizacion").value;
-        const motivo = document.getElementById("filtroMotivo").value;
+    function aplicarFiltrosPagos() {
+        const paciente = filtroPaciente ? filtroPaciente.value : "";
+        const psicologo = filtroPsicologo ? filtroPsicologo.value : "";
+        const fecha = document.getElementById("filtroFechaPago") ? document.getElementById("filtroFechaPago").value : "";
+        const hora = document.getElementById("filtroHoraPago") ? document.getElementById("filtroHoraPago").value : "";
+        const tipoPago = document.getElementById("filtroTipoPago") ? document.getElementById("filtroTipoPago").value : "";
+        const tienePenalizacion = document.getElementById("filtroPenalizacion") ? document.getElementById("filtroPenalizacion").value : "";
+        const motivo = document.getElementById("filtroMotivo") ? document.getElementById("filtroMotivo").value : "";
 
         const filtrados = window._pagos.filter(p => (
             (!paciente || p.pacienteId == paciente) &&
@@ -284,8 +241,91 @@ document.addEventListener("DOMContentLoaded", async () => {
         window._pagosFiltrados = filtrados;
         paginaActual = 1;
         renderTablaPagos(filtrados);
-    };
+    }
 
+    // =======================
+    // 🎨 Ajuste de Campos según modo
+    // =======================
+    function ajustarCamposSegunModo() {
+        const campoComision = form.querySelector("[name='comisionClinica']")?.closest(".campo");
+        const campoTipoPago = form.querySelector("[name='tipoPago']")?.closest(".campo");
+        const campoPenalizacion = form.querySelector("[name='penalizacion']")?.closest(".campo");
+        const campoMonto = form.querySelector("[name='montoTotal']")?.closest(".campo");
+        const campoMotivo = form.querySelector("[name='motivo']")?.closest(".campo");
+        const campoObs = form.querySelector("[name='observaciones']")?.closest(".campo");
+
+        const tipoPagoSelect = form.querySelector("[name='tipoPago']");
+        const comisionInput = form.querySelector("[name='comisionClinica']");
+
+        if (!tipoPagoSelect || !comisionInput) return;
+
+        if (modo === "penalizacion") {
+            campoMonto?.classList.remove("oculto");
+            campoMotivo?.classList.remove("oculto");
+            campoObs?.classList.remove("oculto");
+            campoComision?.classList.add("oculto");
+            campoTipoPago?.classList.add("oculto");
+            campoPenalizacion?.classList.remove("oculto");
+            tipoPagoSelect.removeAttribute("required");
+            comisionInput.removeAttribute("required");
+            tipoPagoSelect.value = "PENALIZACION";
+            comisionInput.value = 0;
+        } else if (modo === "atendida") {
+            campoMonto?.classList.remove("oculto");
+            campoComision?.classList.remove("oculto");
+            campoTipoPago?.classList.remove("oculto");
+            campoMotivo?.classList.remove("oculto");
+            campoObs?.classList.remove("oculto");
+            campoPenalizacion?.classList.add("oculto");
+            tipoPagoSelect.setAttribute("required", true);
+            comisionInput.setAttribute("required", true);
+            tipoPagoSelect.value = "";
+        } else {
+            campoComision?.classList.remove("oculto");
+            campoTipoPago?.classList.remove("oculto");
+            campoPenalizacion?.classList.add("oculto");
+        }
+    }
+
+    // =======================
+    // Inicialización: cargar filtros primero (necesario para los selects)
+    // =======================
+    await cargarFiltrosIniciales();
+
+    // =======================
+    // Si venimos con idCita y modo=ver: mostrar solo ese(ese) pago(s) y detener inicialización adicional
+    // =======================
+    if (idCita && modo === "ver") {
+        try {
+            const resp = await fetch(`${CONFIG.API_BASE_URL}/pagos/cita/${idCita}`, {
+                headers: { Authorization: "Bearer " + token }
+            });
+
+            const datos = await resp.json();
+            const datosArray = Array.isArray(datos) ? datos : (datos ? [datos] : []);
+
+            // Asegurarnos de setear arrays
+            window._pagos = datosArray;
+            window._pagosFiltrados = [...datosArray];
+            paginaActual = 1;
+
+            renderTablaPagos(window._pagosFiltrados);
+
+            // Ocultar filtros porque solo es 1 pago (si existe el contenedor)
+            const filtrosCont = document.querySelector(".filtros-container");
+            if (filtrosCont) filtrosCont.style.display = "none";
+
+            // Detenemos aquí la inicialización adicional para evitar que se carguen todos los pagos
+            return;
+        } catch (e) {
+            console.error("Error cargando pago por cita", e);
+            // No retornamos para permitir continuar con la carga normal si hubo error
+        }
+    }
+
+    // =======================
+    // Vincular filtros y botones
+    // =======================
     const filtros = [
         filtroPaciente,
         filtroPsicologo,
@@ -294,138 +334,155 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("filtroTipoPago"),
         document.getElementById("filtroPenalizacion"),
         document.getElementById("filtroMotivo")
-    ];
+    ].filter(Boolean);
     filtros.forEach(f => f.addEventListener("change", aplicarFiltrosPagos));
 
-    document.getElementById("btnRestablecerPagos").addEventListener("click", () => {
-        filtros.forEach(f => f.value = "");
-        window._pagosFiltrados = [...window._pagos];
-        paginaActual = 1;
-        renderTablaPagos(window._pagosFiltrados);
-    });
+    const btnRest = document.getElementById("btnRestablecerPagos");
+    if (btnRest) {
+        btnRest.addEventListener("click", () => {
+            filtros.forEach(f => f.value = "");
+            window._pagosFiltrados = [...window._pagos];
+            paginaActual = 1;
+            renderTablaPagos(window._pagosFiltrados);
+        });
+    }
 
     // =======================
     // Botón cancelar modal
     // =======================
-    btnCancelar.addEventListener("click", () => {
-        modal.style.display = "none";
-        window.history.back(); // vuelve a la página anterior
-    });
+    if (btnCancelar) {
+        btnCancelar.addEventListener("click", () => {
+            modal.style.display = "none";
+            window.history.back(); // vuelve a la página anterior
+        });
+    }
 
     // =======================
     // Registro de pagos
     // =======================
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const datos = Object.fromEntries(new FormData(form).entries());
-        datos.citaId = parseInt(idCita);
-        datos.penalizacion = parseFloat(datos.penalizacion || 0);
-        datos.comisionClinica = parseFloat(datos.comisionClinica || 0);
+    if (form) {
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(form).entries());
+            datos.citaId = parseInt(idCita);
+            datos.penalizacion = parseFloat(datos.penalizacion || 0);
+            datos.comisionClinica = parseFloat(datos.comisionClinica || 0);
 
-        if (modo === "penalizacion") {
-            datos.tipoPago = "PENALIZACION";
-        } else {
-            if (!form.tipoPago.value) {
-                alert("Selecciona el tipo de pago.");
+            if (modo === "penalizacion") {
+                datos.tipoPago = "PENALIZACION";
+            } else {
+                if (!form.tipoPago.value) {
+                    alert("Selecciona el tipo de pago.");
+                    return;
+                }
+                datos.tipoPago = form.tipoPago.value;
+            }
+
+            if (!datos.montoTotal || parseFloat(datos.montoTotal) <= 0) {
+                alert("Ingresa un monto válido.");
                 return;
             }
-            datos.tipoPago = form.tipoPago.value;
-        }
 
-        if (!datos.montoTotal || parseFloat(datos.montoTotal) <= 0) {
-            alert("Ingresa un monto válido.");
-            return;
-        }
+            const resp = await fetch(`${CONFIG.API_BASE_URL}/pagos`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                body: JSON.stringify(datos)
+            });
 
-        const resp = await fetch(`${CONFIG.API_BASE_URL}/pagos`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-            body: JSON.stringify(datos)
+            if (!resp.ok) {
+                alert("Error al registrar pago.");
+                return;
+            }
+
+            // Cambiar estado de cita
+            const nuevoEstado = (modo === "penalizacion") ? "NO_ASISTIO" : "ATENDIDA";
+            await fetch(`${CONFIG.API_BASE_URL}/secretaria/citas/${idCita}/estado?estado=${nuevoEstado}`, {
+                method: "PUT",
+                headers: { Authorization: "Bearer " + token }
+            });
+
+            Swal.fire({
+                icon: modo === "penalizacion" ? 'warning' : 'success',
+                title: modo === "penalizacion" ? 'Penalización registrada' : 'Pago registrado',
+                text: modo === "penalizacion"
+                    ? 'Se registró la penalización del paciente.'
+                    : 'El pago de la cita se registró correctamente.',
+                confirmButtonText: 'Aceptar'
+            });
+
+            await cargarPagos(true);
+            modal.style.display = "none";
         });
-
-        if (!resp.ok) {
-            alert("Error al registrar pago.");
-            return;
-        }
-
-        // Cambiar estado de cita
-        const nuevoEstado = (modo === "penalizacion") ? "NO_ASISTIO" : "ATENDIDA";
-        await fetch(`${CONFIG.API_BASE_URL}/secretaria/citas/${idCita}/estado?estado=${nuevoEstado}`, {
-            method: "PUT",
-            headers: { Authorization: "Bearer " + token }
-        });
-
-        Swal.fire({
-            icon: modo === "penalizacion" ? 'warning' : 'success',
-            title: modo === "penalizacion" ? 'Penalización registrada' : 'Pago registrado',
-            text: modo === "penalizacion"
-                ? 'Se registró la penalización del paciente.'
-                : 'El pago de la cita se registró correctamente.',
-            confirmButtonText: 'Aceptar'
-        });
-
-        await cargarPagos(true);
-        modal.style.display = "none";
-    });
+    }
 
     // =======================
     // Abrir modal de registro solo si no es modo "ver"
     // =======================
     if (idCita && modo !== "ver") {
         ajustarCamposSegunModo();
-        const respCita = await fetch(`${CONFIG.API_BASE_URL}/secretaria/citas/${idCita}`, { headers: { Authorization: "Bearer " + token } });
-        const cita = await respCita.json();
-        const pacienteId = cita.pacienteId;
+        try {
+            const respCita = await fetch(`${CONFIG.API_BASE_URL}/secretaria/citas/${idCita}`, { headers: { Authorization: "Bearer " + token } });
+            const cita = await respCita.json();
+            const pacienteId = cita.pacienteId;
 
-        const respPen = await fetch(`${CONFIG.API_BASE_URL}/pagos/penalizaciones/${pacienteId}`, { headers: { Authorization: "Bearer " + token } });
-        const penalizaciones = await respPen.json();
+            const respPen = await fetch(`${CONFIG.API_BASE_URL}/pagos/penalizaciones/${pacienteId}`, { headers: { Authorization: "Bearer " + token } });
+            const penalizaciones = await respPen.json();
 
-        const divPen = document.getElementById("penalizacionesPendientes");
-        divPen.innerHTML = "";
-        if (penalizaciones.length > 0) {
-            divPen.style.display = "block";
-            penalizaciones.forEach(p => {
-                const div = document.createElement("div");
-                div.className = "pen-item";
-                div.style.marginBottom = "5px";
-                div.textContent = `🔴 Penalización pendiente: $${p.penalizacion}`;
-                divPen.appendChild(div);
-            });
-        } else {
-            divPen.style.display = "none";
+            const divPen = document.getElementById("penalizacionesPendientes");
+            if (divPen) divPen.innerHTML = "";
+            if (penalizaciones.length > 0 && divPen) {
+                divPen.style.display = "block";
+                penalizaciones.forEach(p => {
+                    const div = document.createElement("div");
+                    div.className = "pen-item";
+                    div.style.marginBottom = "5px";
+                    div.textContent = `🔴 Penalización pendiente: $${p.penalizacion}`;
+                    divPen.appendChild(div);
+                });
+            } else if (divPen) {
+                divPen.style.display = "none";
+            }
+
+            if (modo === "penalizacion") {
+                if (form) {
+                    form.montoTotal.value = 200;
+                    form.motivo.value = "Penalización por inasistencia";
+                    form.penalizacion.value = 200;
+                }
+            } else if (form) {
+                form.montoTotal.value = 500;
+                form.motivo.value = "Cita atendida";
+            }
+
+            modal.style.display = "flex";
+        } catch (err) {
+            console.error("Error preparando modal de registro:", err);
         }
-
-        if (modo === "penalizacion") {
-            form.montoTotal.value = 200;
-            form.motivo.value = "Penalización por inasistencia";
-            form.penalizacion.value = 200;
-        } else {
-            form.montoTotal.value = 500;
-            form.motivo.value = "Cita atendida";
-        }
-
-        modal.style.display = "flex";
     } else {
+        // Si no hay idCita o estamos en modo normal, mostramos lista y filtros
         modal.style.display = "none";
-        form.style.display = "none";
+        if (form) form.style.display = "none";
         await cargarPagos(true);
     }
 
     // =======================
     // Modal de reporte
     // =======================
-    btnReporte.addEventListener("click", () => modalFormato.classList.remove("oculto"));
-    btnCerrarModal.addEventListener("click", () => modalFormato.classList.add("oculto"));
+    if (btnReporte) btnReporte.addEventListener("click", () => modalFormato.classList.remove("oculto"));
+    if (btnCerrarModal) btnCerrarModal.addEventListener("click", () => modalFormato.classList.add("oculto"));
     window.addEventListener("click", (e) => { if (e.target === modalFormato) modalFormato.classList.add("oculto"); });
 
-    btnPdf.addEventListener("click", () => {
-        generarReportePagosPDF(window._pagosFiltrados);
-        modalFormato.classList.add("oculto");
-    });
+    if (btnPdf) {
+        btnPdf.addEventListener("click", () => {
+            generarReportePagosPDF(window._pagosFiltrados);
+            modalFormato.classList.add("oculto");
+        });
+    }
+    if (btnExcel) {
+        btnExcel.addEventListener("click", () => {
+            generarReportePagosExcel(window._pagosFiltrados);
+            modalFormato.classList.add("oculto");
+        });
+    }
 
-    btnExcel.addEventListener("click", () => {
-        generarReportePagosExcel(window._pagosFiltrados);
-        modalFormato.classList.add("oculto");
-    });
-
-});
+}); // end DOMContentLoaded
