@@ -37,6 +37,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const idCita = urlParams.get("idCita");
     const modo = (urlParams.get("modo") || "registro").toLowerCase();
+    if (idCita && modo === "ver") {
+        try {
+            const resp = await fetch(`${CONFIG.API_BASE_URL}/pagos/cita/${idCita}`, {
+                headers: { Authorization: "Bearer " + token }
+            });
+
+            const pago = await resp.json();
+
+            window._pagos = pago;             // Solo el pago de esta cita
+            window._pagosFiltrados = pago;    // Para paginación
+            paginaActual = 1;
+
+            renderTablaPagos(window._pagosFiltrados);
+
+            // Ocultar filtros porque solo es 1 pago
+            document.querySelector(".filtros-container").style.display = "none";
+
+            return; // IMPORTANTE: evita cargar todos los pagos después
+        } catch (e) {
+            console.error("Error cargando pago por cita", e);
+        }
+    }
 
     // =======================
     // 📝 Funciones auxiliares
@@ -285,10 +307,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // =======================
     // Botón cancelar modal
     // =======================
-btnCancelar.addEventListener("click", () => {
-    modal.style.display = "none";
-    window.history.back(); // vuelve a la página anterior
-});
+    btnCancelar.addEventListener("click", () => {
+        modal.style.display = "none";
+        window.history.back(); // vuelve a la página anterior
+    });
 
     // =======================
     // Registro de pagos
