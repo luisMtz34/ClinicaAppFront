@@ -6,8 +6,9 @@
   font-family: 'Poppins', sans-serif;
 }
 
-body {
-  background-color: #f5f5f7; /* fondo general */
+html, body {
+  min-height: 100vh;
+  background-color: #f5f5f7;
   color: #333;
 }
 
@@ -16,7 +17,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #44749d; /* azul principal */
+  background-color: #44749d;
   color: #ffffff;
   padding: 15px 30px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.1);
@@ -27,7 +28,7 @@ header h1 {
 }
 
 #btnSalir {
-  background-color: #ebe7e0; /* botón claro */
+  background-color: #ebe7e0;
   color: #44749d;
   border: none;
   border-radius: 6px;
@@ -37,25 +38,26 @@ header h1 {
 }
 
 #btnSalir:hover {
-  background-color: #bdb8ad; /* hover acento */
+  background-color: #bdb8ad;
   color: #ffffff;
 }
 
-/* Main layout */
+/* --- MAIN RESPONSIVO REAL --- */
 main {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 25px; 
   padding: 30px;
+  width: 100%;
 }
 
 /* Formulario */
 .form-container {
-  background-color: #c6d4e1; /* tarjeta suave */
-  flex: 1;
-  min-width: 300px;
-  max-width: 380px;
+  background-color: #c6d4e1;
+  flex: 1 1 320px;         /* ✔ Ajustable */
+  max-width: 420px;        /* ✔ No rompe layout */
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.08);
@@ -86,7 +88,7 @@ input, select {
 /* Botón enviar */
 .btn-primary {
   margin-top: 15px;
-  background-color: #44749d; /* azul principal */
+  background-color: #44749d;
   color: #ffffff;
   border: none;
   padding: 10px;
@@ -97,14 +99,14 @@ input, select {
 }
 
 .btn-primary:hover {
-  background-color: #5a82aa; /* azul más claro al pasar */
+  background-color: #5a82aa;
 }
 
 /* Tabla */
 .table-container {
-  background-color: #ebe7e0; /* tarjeta clara */
-  flex: 2;
-  min-width: 500px;
+  background-color: #ebe7e0;
+  flex: 2 1 520px;      /* ✔ Flexible, pero amplio */
+  max-width: 100%;
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
@@ -118,13 +120,15 @@ input, select {
 .styled-table {
   width: 100%;
   border-collapse: collapse;
-   font-family: 'Poppins', sans-serif; 
-  font-size: 14px; 
+  table-layout: fixed;
+  font-size: 14px;
 }
 
-.styled-table th, .styled-table td {
+.styled-table th, 
+.styled-table td {
   padding: 12px 15px;
   border: 1px solid #bdb8ad;
+  word-wrap: break-word;
   text-align: left;
 }
 
@@ -132,8 +136,7 @@ input, select {
   background-color: #44749d;
   color: white;
   text-transform: uppercase;
-    font-family: 'Poppins', sans-serif;
-  font-weight: 600; 
+  font-weight: 600;
   font-size: 15px;
 }
 
@@ -145,11 +148,11 @@ input, select {
   background-color: #c6d4e1;
 }
 
-/* fondo oscuro del modal */
+/* Modal */
 #modalEditarPaciente {
-  display: none; /* oculto por defecto */
+  display: none;
   position: fixed;
-  z-index: 1000; /* alto para estar sobre todo */
+  z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;
@@ -159,7 +162,6 @@ input, select {
   align-items: center;
 }
 
-/* contenido del modal */
 #modalEditarPaciente .modal-content {
   background-color: #fff;
   padding: 20px 30px;
@@ -169,7 +171,6 @@ input, select {
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
-/* botones dentro del modal */
 .modal-buttons {
   display: flex;
   justify-content: flex-end;
@@ -177,24 +178,24 @@ input, select {
   margin-top: 20px;
 }
 
-.modal-buttons button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
+/* Botones del modal */
 .btn-guardar {
   background-color: #4CAF50;
   color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .btn-cancelar {
   background-color: #f44336;
   color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
-/* ====== BOTONES GENERALES ====== */
+/* Botones generales */
 button {
   font-family: 'Poppins', sans-serif;
   font-weight: 500;
@@ -203,52 +204,51 @@ button {
   transition: 0.2s ease;
 }
 
-/* Botón Editar en la tabla */
+/* Botón Editar */
 .btnEditar {
-  background-color: #2196f3;
+  background-color: #3498db;
   color: white;
   padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s ease;
 }
 
 .btnEditar:hover {
-  background-color: #1976d2;
-}
-.styled-table {
-  table-layout: fixed; /* fuerza que se respeten los anchos */
-  width: 100%;
+  background-color: #2c81ba;
 }
 
-.styled-table th, .styled-table td {
-  word-wrap: break-word; /* corta palabras largas */
-}
+/* Botón Eliminar */
 .btnEliminar {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    font-weight: bold;
+  background-color: #e74c3c;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s ease;
 }
 
 .btnEliminar:hover {
-    background-color: #c0392b;
+  background-color: #c0392b;
+}
+/* --- Igualar ancho de botones de acciones --- */
+.btnEditar,
+.btnEliminar {
+  width: 90px;
 }
 
-.btnEditar {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    font-weight: bold;
-}
 
-.btnEditar:hover {
-    background-color: #2c81ba;
+/* --- BREAKPOINT PARA EVITAR QUE SE AMONTONE --- */
+@media (max-width: 1100px) {
+  main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .table-container,
+  .form-container {
+    max-width: 95%;
+  }
 }
