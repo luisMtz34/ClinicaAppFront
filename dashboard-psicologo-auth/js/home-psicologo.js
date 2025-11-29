@@ -75,7 +75,7 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
         if (result.isConfirmed) {
             localStorage.removeItem("accessToken");
 
-            Swal.fire({
+            Swal.fire({ 
                 title: "Sesión cerrada",
                 text: "Serás redirigido al login.",
                 icon: "success",
