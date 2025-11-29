@@ -108,6 +108,18 @@ body {
   height: auto;
   border-radius: 15px;
 }
+/* Footer profesional */
+.footer-credit {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #444; /* Gris oscuro para máxima legibilidad */
+  font-family: 'Poppins', sans-serif;
+  opacity: 0.9;
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {
