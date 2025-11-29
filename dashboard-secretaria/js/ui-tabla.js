@@ -1,4 +1,3 @@
-// ui-tabla.js
 import { cargarListas } from "./api-secretaria.js";
 
 export function generarTablaHorarios() {
@@ -43,7 +42,6 @@ export function inicializarDelegacionClick() {
     }
   });
 
-  // ✅ Aquí corregido
   nuevo.addEventListener("click", async (e) => {
     const celda = e.target.closest("td[data-consultorio]");
     if (!celda) return;
@@ -187,7 +185,6 @@ export function inicializarDelegacionClick() {
   });
 
 }
-
 
 function resetearModal(form, btnGuardarCita, btnIrPagos, btnCerrar) {
   form.querySelectorAll("input, select, textarea").forEach(campo => campo.disabled = false);

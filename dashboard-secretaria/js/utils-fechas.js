@@ -1,5 +1,3 @@
-// utils-fechas.js
-
 // === Mostrar la fecha actual y sincronizar calendario ===
 export function mostrarFecha(fecha) {
   const opciones = { day: "2-digit", month: "short", year: "numeric" };
